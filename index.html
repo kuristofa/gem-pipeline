@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GEM Pipeline · Custom GPT Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ── tokens ─────────────────────────────────────────────────────────── */
+  :root {
+    --bg: #0c0f14;
+    --surface: #141923;
+    --surface-2: #1a212d;
+    --border: #232a37;
+    --border-soft: #1a2029;
+    --ink: #e6e9ef;
+    --ink-dim: #8a93a4;
+    --ink-faint: #5a6373;
+    --accent: #c7e300;     /* acid citron — signature */
+    --accent-dark: #8aa000;
+    --pass: #7dd3a0;
+    --fail: #f47867;
+    --running: #f5a524;
+    --display: 'Fraunces', Georgia, serif;
+    --body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ── layout ─────────────────────────────────────────────────────────── */
+  .frame { max-width: 920px; margin: 0 auto; padding: 56px 32px 96px; }
+  @media (max-width: 640px) { .frame { padding: 40px 20px 64px; } }
+
+  /* ── header ─────────────────────────────────────────────────────────── */
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-dim); display: flex; align-items: center; gap: 14px; }
+  .eyebrow::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .eyebrow .dot { width: 6px; height: 6px; background: var(--accent); display: inline-block; }
+
+  h1.hero { font-family: var(--display); font-weight: 400; font-size: clamp(36px, 6vw, 64px); line-height: 1.05; letter-spacing: -0.02em; margin: 24px 0 20px; max-width: 18ch; font-variation-settings: "opsz" 80; }
+  h1.hero em { font-style: italic; color: var(--accent); font-weight: 400; }
+
+  .sub { color: var(--ink-dim); max-width: 56ch; font-size: 16px; margin-bottom: 48px; }
+
+  /* ── pipeline schematic ─────────────────────────────────────────────── */
+  .pipeline { margin: 48px 0 56px; padding: 28px 24px; border: 1px solid var(--border); background: linear-gradient(180deg, var(--surface) 0%, transparent 100%); }
+  .pipeline-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); }
+  .pipeline-header .status { color: var(--accent); }
+
+  .nodes { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; position: relative; }
+  .node { position: relative; padding: 16px 8px; text-align: center; }
+  .node::before { content: ''; position: absolute; top: 24px; left: 0; right: 0; height: 1px; background: var(--border); z-index: 0; }
+  .node:first-child::before { left: 50%; }
+  .node:last-child::before { right: 50%; }
+  .node-dot { position: relative; z-index: 1; width: 16px; height: 16px; margin: 0 auto 12px; border: 1px solid var(--border); background: var(--bg); transition: all 0.3s ease; }
+  .node.done .node-dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 4px rgba(199, 227, 0, 0.1); }
+  .node.running .node-dot { background: var(--running); border-color: var(--running); animation: pulse 1.2s ease-in-out infinite; }
+  .node.fail .node-dot { background: var(--fail); border-color: var(--fail); }
+  @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(245, 165, 36, 0.5); } 50% { box-shadow: 0 0 0 8px rgba(245, 165, 36, 0); } }
+  .node-num { font-family: var(--mono); font-size: 10px; color: var(--ink-faint); letter-spacing: 0.1em; }
+  .node-label { font-family: var(--mono); font-size: 11px; color: var(--ink-dim); margin-top: 4px; }
+  .node.done .node-label, .node.running .node-label { color: var(--ink); }
+  @media (max-width: 640px) {
+    .nodes { grid-template-columns: repeat(3, 1fr); gap: 16px 4px; }
+    .node::before { display: none; }
+  }
+
+  /* ── form ───────────────────────────────────────────────────────────── */
+  .form-section { margin-bottom: 48px; }
+  .form-label { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 10px; }
+  .form-label .num { color: var(--accent); margin-right: 8px; }
+  .form-hint { font-size: 13px; color: var(--ink-faint); margin-top: 8px; font-family: var(--body); }
+  input[type="text"], textarea {
+    width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--ink);
+    font-family: var(--body); font-size: 15px; padding: 14px 16px; border-radius: 0;
+    transition: border-color 0.15s ease;
+  }
+  input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 120px; line-height: 1.55; }
+  textarea.tall { min-height: 180px; }
+  input[type="text"].mono { font-family: var(--mono); font-size: 13px; }
+
+  /* ── buttons ────────────────────────────────────────────────────────── */
+  .btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 24px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; border: 1px solid var(--accent); background: var(--accent); color: #0c0f14; cursor: pointer; transition: all 0.15s ease; font-weight: 500; }
+  .btn:hover { background: transparent; color: var(--accent); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+  .btn.ghost { background: transparent; color: var(--ink-dim); border-color: var(--border); }
+  .btn.ghost:hover { color: var(--ink); border-color: var(--ink-dim); background: transparent; }
+  .btn.small { padding: 8px 14px; font-size: 11px; }
+
+  /* ── result panels ──────────────────────────────────────────────────── */
+  #results { display: none; }
+  #results.visible { display: block; }
+
+  .verdict { padding: 24px 28px; border: 1px solid var(--border); margin-bottom: 32px; display: flex; align-items: center; gap: 20px; }
+  .verdict.pass { border-color: var(--pass); background: rgba(125, 211, 160, 0.04); }
+  .verdict.fail { border-color: var(--fail); background: rgba(244, 120, 103, 0.04); }
+  .verdict-mark { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 20px; font-weight: 500; flex-shrink: 0; }
+  .verdict.pass .verdict-mark { background: var(--pass); color: #0c0f14; }
+  .verdict.fail .verdict-mark { background: var(--fail); color: #0c0f14; }
+  .verdict-text { flex: 1; }
+  .verdict-text .label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); }
+  .verdict-text .name { font-family: var(--display); font-size: 24px; margin-top: 4px; }
+
+  details.section { border: 1px solid var(--border); margin-bottom: 12px; }
+  details.section[open] { border-color: var(--border); }
+  details.section summary {
+    list-style: none; cursor: pointer; padding: 18px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  details.section summary::-webkit-details-marker { display: none; }
+  details.section summary:hover { background: var(--surface); }
+  .section-num { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.12em; width: 32px; flex-shrink: 0; }
+  .section-title { font-family: var(--display); font-size: 18px; flex: 1; font-weight: 400; }
+  .section-meta { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.1em; text-transform: uppercase; }
+  details.section[open] summary { border-bottom: 1px solid var(--border-soft); }
+  .section-body { padding: 24px; }
+  .section-actions { display: flex; gap: 8px; padding: 0 24px 20px; }
+
+  /* ── content rendering ──────────────────────────────────────────────── */
+  .md-out { font-family: var(--mono); font-size: 12.5px; line-height: 1.7; color: var(--ink); white-space: pre-wrap; max-height: 480px; overflow: auto; padding: 20px; background: var(--surface); border: 1px solid var(--border-soft); }
+  .md-out::-webkit-scrollbar { width: 8px; }
+  .md-out::-webkit-scrollbar-track { background: transparent; }
+  .md-out::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .purpose-card { padding: 24px; border-left: 2px solid var(--accent); background: var(--surface); font-family: var(--display); font-size: 18px; line-height: 1.5; font-style: italic; color: var(--ink); }
+
+  /* ── audit detail ───────────────────────────────────────────────────── */
+  .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 24px; }
+  @media (max-width: 640px) { .checks { grid-template-columns: 1fr; } }
+  .check { background: var(--bg); padding: 14px 18px; }
+  .check .name { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 4px; }
+  .check .stat { font-family: var(--mono); font-size: 13px; font-weight: 500; }
+  .check.pass .stat { color: var(--pass); }
+  .check.fail .stat { color: var(--fail); }
+  .check-detail { margin-top: 6px; font-size: 12px; color: var(--ink-faint); font-family: var(--mono); }
+
+  /* ── tactical cards ─────────────────────────────────────────────────── */
+  .tactic { border: 1px solid var(--border); padding: 18px 20px; margin-bottom: 10px; background: var(--surface); }
+  .tactic-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 8px; }
+  .tactic-label { font-family: var(--display); font-size: 16px; }
+  .tactic-trigger { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); }
+  .tactic-snippet { font-family: var(--mono); font-size: 12.5px; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border-soft); margin-top: 10px; white-space: pre-wrap; }
+  .tactic-snippet-actions { margin-top: 8px; }
+
+  /* ── correction flow ────────────────────────────────────────────────── */
+  .correction { margin: 32px 0; padding: 28px; border: 1px dashed var(--fail); background: rgba(244, 120, 103, 0.03); }
+  .correction h3 { font-family: var(--display); font-size: 20px; margin: 0 0 8px; font-weight: 400; }
+  .correction p { color: var(--ink-dim); margin: 0 0 16px; font-size: 14px; }
+
+  /* ── overlay / loading ──────────────────────────────────────────────── */
+  .toast { position: fixed; bottom: 24px; right: 24px; padding: 14px 20px; background: var(--surface); border: 1px solid var(--border); font-family: var(--mono); font-size: 12px; color: var(--ink); z-index: 100; opacity: 0; transform: translateY(8px); transition: all 0.2s ease; }
+  .toast.visible { opacity: 1; transform: translateY(0); }
+  .toast.success { border-color: var(--pass); }
+  .toast.error { border-color: var(--fail); }
+
+  /* ── footer ─────────────────────────────────────────────────────────── */
+  .foot { margin-top: 80px; padding-top: 32px; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--ink-faint); display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<div class="frame">
+
+  <!-- header -->
+  <div class="eyebrow"><span class="dot"></span> GEM Pipeline · v1</div>
+  <h1 class="hero">From raw idea to <em>deployable</em> Custom GPT, in one pass.</h1>
+  <p class="sub">Six specialized LLM nodes — Architect, Domain Expert, Operationalizer, KB Builder, MetaPrompt, QA Auditor — chained into a deterministic n8n pipeline. You describe what you want. It returns a System Prompt and a Knowledge Base file you paste straight into ChatGPT's Configure tab.</p>
+
+  <!-- pipeline schematic -->
+  <div class="pipeline">
+    <div class="pipeline-header">
+      <span>Pipeline schematic</span>
+      <span class="status" id="pipelineStatus">Idle</span>
+    </div>
+    <div class="nodes" id="nodes">
+      <div class="node" data-node="1"><div class="node-dot"></div><div class="node-num">N1</div><div class="node-label">Architect</div></div>
+      <div class="node" data-node="2"><div class="node-dot"></div><div class="node-num">N2</div><div class="node-label">Domain</div></div>
+      <div class="node" data-node="3"><div class="node-dot"></div><div class="node-num">N3</div><div class="node-label">SOP</div></div>
+      <div class="node" data-node="4"><div class="node-dot"></div><div class="node-num">N4</div><div class="node-label">KB</div></div>
+      <div class="node" data-node="5"><div class="node-dot"></div><div class="node-num">N5</div><div class="node-label">Prompt</div></div>
+      <div class="node" data-node="6"><div class="node-dot"></div><div class="node-num">N6</div><div class="node-label">Audit</div></div>
+    </div>
+  </div>
+
+  <!-- form -->
+  <div id="form-area">
+    <div class="form-section">
+      <label class="form-label" for="webhook"><span class="num">01</span>Webhook endpoint</label>
+      <input type="text" id="webhook" class="mono" placeholder="https://your-n8n.example.com/webhook/gem-pipeline">
+      <div class="form-hint">Saved locally on this device. Get the URL from the Webhook node in n8n after you activate the workflow.</div>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label" for="raw_idea"><span class="num">02</span>Raw idea or goal</label>
+      <textarea id="raw_idea" class="tall" placeholder="Describe the Custom GPT you want to build. What does it do, who is it for, what kind of input does it take, what should it output? The more specific, the better the SOP."></textarea>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label" for="system_context"><span class="num">03</span>System context <span style="color:var(--ink-faint);font-weight:400">— optional</span></label>
+      <textarea id="system_context" placeholder="If this GPT is one node in a larger multi-GPT system, describe the surrounding nodes so the Architect knows what to delegate vs. own."></textarea>
+    </div>
+
+    <button class="btn" id="runBtn">Run pipeline →</button>
+  </div>
+
+  <!-- results -->
+  <div id="results">
+    <div class="verdict" id="verdict">
+      <div class="verdict-mark" id="verdictMark">—</div>
+      <div class="verdict-text">
+        <div class="label" id="verdictLabel">Audit result</div>
+        <div class="name" id="gptName">—</div>
+      </div>
+      <button class="btn ghost small" id="newRunBtn">New run</button>
+    </div>
+
+    <details class="section" id="sec-purpose" open>
+      <summary>
+        <span class="section-num">A</span>
+        <span class="section-title">Purpose Statement</span>
+        <span class="section-meta">verified</span>
+      </summary>
+      <div class="section-body">
+        <div class="purpose-card" id="purposeOut">—</div>
+      </div>
+    </details>
+
+    <details class="section" id="sec-system-prompt" open>
+      <summary>
+        <span class="section-num">B</span>
+        <span class="section-title">System Prompt — paste into Configure → Instructions</span>
+        <span class="section-meta" id="systemPromptMeta">— chars</span>
+      </summary>
+      <div class="section-body"><div class="md-out" id="systemPromptOut">—</div></div>
+      <div class="section-actions">
+        <button class="btn small" data-copy="systemPromptOut">Copy</button>
+        <button class="btn ghost small" data-download="system_prompt" data-suffix="-system-prompt.md">Download .md</button>
+      </div>
+    </details>
+
+    <details class="section" id="sec-kb" open>
+      <summary>
+        <span class="section-num">C</span>
+        <span class="section-title">Knowledge Base — upload to Configure → Knowledge</span>
+        <span class="section-meta" id="kbMeta">— chars</span>
+      </summary>
+      <div class="section-body"><div class="md-out" id="kbOut">—</div></div>
+      <div class="section-actions">
+        <button class="btn small" data-copy="kbOut">Copy</button>
+        <button class="btn ghost small" data-download="kb_file" data-suffix="-knowledge-base.md">Download .md</button>
+      </div>
+    </details>
+
+    <details class="section" id="sec-audit">
+      <summary>
+        <span class="section-num">D</span>
+        <span class="section-title">Audit Detail</span>
+        <span class="section-meta" id="auditMeta">6 checks</span>
+      </summary>
+      <div class="section-body">
+        <div class="checks" id="checksGrid"></div>
+      </div>
+    </details>
+
+    <details class="section" id="sec-tactical">
+      <summary>
+        <span class="section-num">E</span>
+        <span class="section-title">Tactical Prompting Library — for live sessions</span>
+        <span class="section-meta" id="tacticalMeta">— tactics</span>
+      </summary>
+      <div class="section-body" id="tacticalOut"></div>
+    </details>
+
+    <details class="section" id="sec-idea">
+      <summary>
+        <span class="section-num">F</span>
+        <span class="section-title">Idea Document</span>
+        <span class="section-meta">internal</span>
+      </summary>
+      <div class="section-body"><div class="md-out" id="ideaOut">—</div></div>
+      <div class="section-actions"><button class="btn small" data-copy="ideaOut">Copy</button></div>
+    </details>
+
+    <details class="section" id="sec-knowledge-report">
+      <summary>
+        <span class="section-num">G</span>
+        <span class="section-title">Knowledge Report</span>
+        <span class="section-meta">internal</span>
+      </summary>
+      <div class="section-body"><div class="md-out" id="knowledgeReportOut">—</div></div>
+      <div class="section-actions"><button class="btn small" data-copy="knowledgeReportOut">Copy</button></div>
+    </details>
+
+    <details class="section" id="sec-sop">
+      <summary>
+        <span class="section-num">H</span>
+        <span class="section-title">Operationalized SOP</span>
+        <span class="section-meta">internal</span>
+      </summary>
+      <div class="section-body"><div class="md-out" id="sopOut">—</div></div>
+      <div class="section-actions"><button class="btn small" data-copy="sopOut">Copy</button></div>
+    </details>
+
+    <div class="correction" id="correctionArea" style="display:none">
+      <h3>Course correction</h3>
+      <p>The auditor flagged issues. Add specific corrections below and re-run — the corrections feed into the Operationalizer on the next pass.</p>
+      <textarea id="correction_input" placeholder="e.g. The SOP missed the constraint about output length. Token shortcuts found in Step 4. The retrieval rule for 'Decision Rules' has no matching KB section."></textarea>
+      <div style="margin-top:16px"><button class="btn" id="rerunBtn">Re-run with corrections →</button></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>n8n + OpenAI · Pipeline by GEM framework</span>
+    <span>Bryan / Daron Vener — automated</span>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  // ── persistence ─────────────────────────────────────────────────────
+  const STORE_KEY = 'gem-pipeline-config';
+  const loadCfg = () => { try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { return {}; } };
+  const saveCfg = (c) => { try { localStorage.setItem(STORE_KEY, JSON.stringify(c)); } catch {} };
+  const cfg = loadCfg();
+  const $ = (id) => document.getElementById(id);
+  $('webhook').value = cfg.webhook || '';
+  $('raw_idea').value = cfg.last_idea || '';
+  $('system_context').value = cfg.last_ctx || '';
+
+  // ── pipeline visualization ─────────────────────────────────────────
+  const setNodeStatus = (n, status) => {
+    const el = document.querySelector(`.node[data-node="${n}"]`);
+    if (!el) return;
+    el.classList.remove('done','running','fail');
+    if (status) el.classList.add(status);
+  };
+  const resetNodes = () => { for (let i=1;i<=6;i++) setNodeStatus(i, null); };
+  const setAllRunning = () => { for (let i=1;i<=6;i++) setNodeStatus(i, 'running'); };
+  const setAllDone = () => { for (let i=1;i<=6;i++) setNodeStatus(i, 'done'); };
+
+  // ── toast ──────────────────────────────────────────────────────────
+  const toast = (msg, kind='success', ms=3000) => {
+    const t = $('toast');
+    t.textContent = msg;
+    t.className = `toast visible ${kind}`;
+    setTimeout(() => { t.className = 'toast'; }, ms);
+  };
+
+  // ── current result cache (for downloads) ───────────────────────────
+  let lastResult = null;
+
+  // ── run pipeline ───────────────────────────────────────────────────
+  const run = async (courseCorrection = '') => {
+    const webhook = $('webhook').value.trim();
+    const raw_idea = $('raw_idea').value.trim();
+    const system_context = $('system_context').value.trim();
+    if (!webhook) { toast('Webhook URL required', 'error'); return; }
+    if (!raw_idea) { toast('Raw idea required', 'error'); return; }
+
+    saveCfg({ webhook, last_idea: raw_idea, last_ctx: system_context });
+
+    $('runBtn').disabled = true;
+    $('rerunBtn') && ($('rerunBtn').disabled = true);
+    $('pipelineStatus').textContent = 'Running · 6 LLM calls in flight (~30–90s)';
+    $('pipelineStatus').style.color = 'var(--running)';
+    resetNodes();
+    setAllRunning();
+
+    try {
+      const res = await fetch(webhook, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ raw_idea, system_context, course_correction: courseCorrection })
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status} — ${res.statusText}`);
+      const data = await res.json();
+      lastResult = data;
+      setAllDone();
+      $('pipelineStatus').textContent = 'Complete';
+      $('pipelineStatus').style.color = 'var(--accent)';
+      render(data);
+    } catch (err) {
+      $('pipelineStatus').textContent = 'Failed · ' + err.message;
+      $('pipelineStatus').style.color = 'var(--fail)';
+      for (let i=1;i<=6;i++) setNodeStatus(i, 'fail');
+      toast('Pipeline failed: ' + err.message, 'error', 5000);
+    } finally {
+      $('runBtn').disabled = false;
+      $('rerunBtn') && ($('rerunBtn').disabled = false);
+    }
+  };
+
+  // ── render results ─────────────────────────────────────────────────
+  const render = (data) => {
+    $('results').classList.add('visible');
+
+    const v = (data.audit && data.audit.verdict) || 'UNKNOWN';
+    const isPass = v === 'PASS';
+    const verdictEl = $('verdict');
+    verdictEl.classList.remove('pass','fail');
+    verdictEl.classList.add(isPass ? 'pass' : 'fail');
+    $('verdictMark').textContent = isPass ? '✓' : '!';
+    $('verdictLabel').textContent = isPass ? 'Audit · PASS' : 'Audit · FAIL';
+    $('gptName').textContent = data.gpt_name || '(unnamed GPT)';
+
+    $('purposeOut').textContent = data.purpose_statement || '—';
+    $('ideaOut').textContent = data.idea_document || '—';
+    $('knowledgeReportOut').textContent = data.knowledge_report || '—';
+    $('sopOut').textContent = data.sop || '—';
+    $('kbOut').textContent = data.kb_file || '—';
+    $('systemPromptOut').textContent = data.system_prompt || '—';
+
+    $('systemPromptMeta').textContent = (data.system_prompt || '').length.toLocaleString() + ' chars';
+    $('kbMeta').textContent = (data.kb_file || '').length.toLocaleString() + ' chars';
+
+    // checks grid
+    const checksHost = $('checksGrid');
+    checksHost.innerHTML = '';
+    const checks = (data.audit && data.audit.checks) || {};
+    const labels = {
+      constraint_coverage: 'Constraint coverage',
+      strategic_drift: 'Strategic drift',
+      token_shortcuts: 'Token shortcuts',
+      forbidden_format: 'Forbidden format',
+      internal_consistency: 'Internal consistency',
+      io_faithfulness: 'I/O faithfulness'
+    };
+    Object.entries(labels).forEach(([key, lbl]) => {
+      const c = checks[key] || {};
+      const status = (c.status || 'UNKNOWN').toUpperCase();
+      const cls = status === 'PASS' ? 'pass' : 'fail';
+      const details = (c.missing || c.drifts || c.instances || c.broken_references || c.mismatches || []);
+      const detailText = details.length ? details.map(d => '· ' + (typeof d === 'string' ? d : JSON.stringify(d))).join('\n') : '';
+      checksHost.insertAdjacentHTML('beforeend', `
+        <div class="check ${cls}">
+          <div class="name">${lbl}</div>
+          <div class="stat">${status}</div>
+          ${detailText ? `<div class="check-detail">${escapeHtml(detailText)}</div>` : ''}
+        </div>
+      `);
+    });
+
+    // tactical
+    const tactics = (data.audit && data.audit.tactical_library) || [];
+    $('tacticalMeta').textContent = `${tactics.length} ${tactics.length === 1 ? 'tactic' : 'tactics'}`;
+    const tacHost = $('tacticalOut');
+    tacHost.innerHTML = tactics.length ? '' : '<div style="color:var(--ink-faint);font-family:var(--mono);font-size:12px">No tactics returned.</div>';
+    tactics.forEach((t, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'tactic';
+      wrap.innerHTML = `
+        <div class="tactic-head">
+          <div class="tactic-label">${escapeHtml(t.tactic || `Tactic ${i+1}`)}</div>
+          <div class="tactic-trigger">${escapeHtml(t.use_when || '')}</div>
+        </div>
+        <div class="tactic-snippet">${escapeHtml(t.snippet || '')}</div>
+        <div class="tactic-snippet-actions"><button class="btn ghost small" data-copy-text="${escapeAttr(t.snippet || '')}">Copy snippet</button></div>
+      `;
+      tacHost.appendChild(wrap);
+    });
+
+    // correction area
+    $('correctionArea').style.display = isPass ? 'none' : 'block';
+    if (!isPass) {
+      const suggested = (data.audit && data.audit.course_correction_prompt) || '';
+      $('correction_input').value = suggested;
+    }
+
+    // scroll to verdict
+    verdictEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  // ── helpers ────────────────────────────────────────────────────────
+  const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const escapeAttr = (s) => escapeHtml(s);
+
+  const slug = (s) => (s || 'gpt').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'gpt';
+
+  const downloadText = (content, filename) => {
+    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  // ── delegated click handlers ───────────────────────────────────────
+  document.addEventListener('click', async (e) => {
+    const copyTarget = e.target.closest('[data-copy]');
+    if (copyTarget) {
+      const t = $(copyTarget.getAttribute('data-copy'));
+      if (t) {
+        try { await navigator.clipboard.writeText(t.textContent || ''); toast('Copied'); }
+        catch { toast('Copy failed', 'error'); }
+      }
+      return;
+    }
+    const copyText = e.target.closest('[data-copy-text]');
+    if (copyText) {
+      try { await navigator.clipboard.writeText(copyText.getAttribute('data-copy-text') || ''); toast('Copied'); }
+      catch { toast('Copy failed', 'error'); }
+      return;
+    }
+    const dlTarget = e.target.closest('[data-download]');
+    if (dlTarget && lastResult) {
+      const field = dlTarget.getAttribute('data-download');
+      const suffix = dlTarget.getAttribute('data-suffix') || '.md';
+      const content = lastResult[field] || '';
+      downloadText(content, slug(lastResult.gpt_name) + suffix);
+      return;
+    }
+  });
+
+  $('runBtn').addEventListener('click', () => run(''));
+  $('rerunBtn').addEventListener('click', () => run($('correction_input').value.trim()));
+  $('newRunBtn').addEventListener('click', () => {
+    $('results').classList.remove('visible');
+    resetNodes();
+    $('pipelineStatus').textContent = 'Idle';
+    $('pipelineStatus').style.color = 'var(--accent)';
+    document.querySelector('#form-area').scrollIntoView({ behavior: 'smooth' });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,921 @@
+{
+  "name": "GEM Pipeline \u00b7 Custom GPT Builder",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gem-pipeline",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "a118a87c-96fc-4f65-9106-babf43da6eb7",
+      "name": "Webhook In",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "webhookId": "ff16b1a1-25b2-4186-81c5-710849541e36"
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "77c95f63-d3f5-4491-85ba-df27cb8539c5",
+              "name": "raw_idea",
+              "value": "={{ $json.body.raw_idea }}",
+              "type": "string"
+            },
+            {
+              "id": "0f19c2ab-19ea-43dd-98b2-1d92897e5635",
+              "name": "system_context",
+              "value": "={{ $json.body.system_context || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a174dc4f-a1ab-47bd-a806-925fe1a653e6",
+              "name": "course_correction",
+              "value": "={{ $json.body.course_correction || '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "588fee6c-050f-4483-8caf-30ae5db0a157",
+      "name": "Initial Setup",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.2, \"max_tokens\": 4096, \"messages\": [   { \"role\": \"system\", \"content\": \"You are a Master Systems Architect and AI Operations Engineer. You apply strict Systems Thinking (the Input-Process-Output model) to clarify a raw idea into a precise operational blueprint for Custom GPT construction.\\n\\nYou treat each GPT as a highly focused operational node. If a System Context is provided, do not assign the GPT tasks that belong to other nodes in that system. If the GPT is standalone, ensure it is fully self-sufficient.\\n\\nYou produce exactly two artifacts and nothing else.\\n\\nPART A \\u2014 IDEA DOCUMENT (use this exact structure and headings):\\n\\nTarget GPT: [Name of GPT]\\nCore Role: [1-2 sentences defining its exact operational purpose]\\nMain Job (Processing):\\n- [Actionable task 1]\\n- [Actionable task 2]\\n- [Internal logic, frameworks, or decisions it must apply]\\nInputs (Upstream Dependencies):\\n- [Exactly what data/variables it receives from the user or the previous system node]\\nOutputs (Downstream Deliverables):\\n- [Exactly what it must produce, including specific formatting, tables, or data structures]\\nGuardrails & Constraints:\\n- [What it MUST NOT do]\\n- [Limits on length, tone, or format]\\n\\nPART B \\u2014 PURPOSE STATEMENT (one sentence, this exact template):\\n\\n\\\"I want to create a Custom GPT that does [XYZ] to produce [Output] within [Constraints] in order to [Goal].\\\"\\n\\nOUTPUT RULES (absolute):\\n- No conversational preamble.\\n- No closing remarks or meta-commentary.\\n- Begin immediately with the line \\\"Target GPT:\\\".\\n- Separate Part A and Part B with the exact delimiter line: ---PURPOSE---\\n- Do not wrap the output in code fences.\\n\" },   { \"role\": \"user\", \"content\": `Raw Idea / Goal:\\n` + $json.raw_idea + `\\n\\nSystem Context (may be empty):\\n` + ($json.system_context || '') } ]}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 180000
+        }
+      },
+      "id": "febe6c31-32f2-47a2-aad6-0182f6332617",
+      "name": "N1 \u00b7 Architect",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gemini API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "759939b3-d04e-4505-a3c8-e3b279d3fb4c",
+              "name": "raw_idea",
+              "value": "={{ $('Initial Setup').item.json.raw_idea }}",
+              "type": "string"
+            },
+            {
+              "id": "ffea0832-f581-4c37-aa42-a633e33ad444",
+              "name": "system_context",
+              "value": "={{ $('Initial Setup').item.json.system_context }}",
+              "type": "string"
+            },
+            {
+              "id": "6e4e80bc-ce18-4f29-86fe-0ba51f0ca313",
+              "name": "course_correction",
+              "value": "={{ $('Initial Setup').item.json.course_correction }}",
+              "type": "string"
+            },
+            {
+              "id": "eef154ee-50c5-47d9-8aee-f53911a60be1",
+              "name": "n1_raw",
+              "value": "={{ $json.choices[0].message.content }}",
+              "type": "string"
+            },
+            {
+              "id": "8afcea35-d9db-48ae-92bd-3f522384e6dd",
+              "name": "idea_document",
+              "value": "={{ $json.choices[0].message.content.split('---PURPOSE---')[0].trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "1f1becff-d8ac-4734-8378-1362a18aec82",
+              "name": "purpose_statement",
+              "value": "={{ ($json.choices[0].message.content.split('---PURPOSE---')[1] || '').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "73df012d-79bb-4e7c-a1d6-a29e2bdd9695",
+              "name": "gpt_name",
+              "value": "={{ (($json.choices[0].message.content.match(/Target GPT:\\s*(.+)/) || [])[1] || 'Custom GPT').trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "dd543f16-eca2-4aed-9ca1-8921f85578c8",
+      "name": "Parse N1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.3, \"max_tokens\": 4096, \"messages\": [   { \"role\": \"system\", \"content\": \"You produce a Knowledge Report analyzing the domain of an AI Assistant's purpose statement. You operate in two phases.\\n\\nPHASE 1 \\u2014 EXPERT DOMAIN RESOURCES\\nMap the premier methodologies, frameworks, and expert practices in the field. Cover:\\n- Industry-standard frameworks (name them specifically).\\n- Proven expert workflows.\\n- Best-in-class tools and approaches.\\n- Established quality benchmarks.\\n\\nPHASE 2 \\u2014 AI-EXECUTABLE STRATEGY\\nFrom Phase 1, extract ONLY the intellectual components that add value beyond basic LLM capabilities:\\n- Strategic frameworks that guide decision-making.\\n- Domain-specific analytical methods.\\n- Expert heuristics and rules of thumb.\\n- Quality standards specific to the field.\\n\\nYou EXCLUDE general LLM capabilities such as language understanding, conversation management, or basic logical reasoning.\\n\\nOUTPUT FORMAT (Markdown, these exact sections, in this order):\\n\\n# Knowledge Report: [GPT Name]\\n\\n## 1. Core Domain Knowledge\\n### Critical principles unique to this field\\n### Expert-level decision criteria\\n### Field-specific evaluation methods\\n\\n## 2. Strategic Process\\n### Key decision points and their triggers\\n### Essential domain questions to consider\\n### Critical success factors\\n\\n## 3. Quality Standards\\n### Domain-specific benchmarks\\n### Industry-standard quality indicators\\n### Field-recognized best practices\\n\\nOUTPUT RULES (absolute):\\n- No preamble. Begin with \\\"# Knowledge Report:\\\".\\n- No closing remarks.\\n- Every bullet is field-specific and concrete. Generic AI advice is forbidden.\\n- Name frameworks explicitly (e.g., \\\"Cynefin\\\", \\\"Wardley Mapping\\\", \\\"Jobs-To-Be-Done\\\"), not generically (\\\"a framework for thinking\\\").\\n- Do not wrap the output in code fences.\\n\" },   { \"role\": \"user\", \"content\": `Purpose Statement:\\n` + $json.purpose_statement + `\\n\\nIdea Document (for context):\\n` + $json.idea_document } ]}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 180000
+        }
+      },
+      "id": "b17d9d70-ecc4-4686-ae5d-9d4a030d589d",
+      "name": "N2 \u00b7 Domain",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gemini API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a4b720f3-94d5-477c-913f-856395e3bee2",
+              "name": "raw_idea",
+              "value": "={{ $('Parse N1').item.json.raw_idea }}",
+              "type": "string"
+            },
+            {
+              "id": "36c9657d-2f87-4b19-b691-08194f3ebd39",
+              "name": "system_context",
+              "value": "={{ $('Parse N1').item.json.system_context }}",
+              "type": "string"
+            },
+            {
+              "id": "3999844f-a924-446a-b972-e26671e01b15",
+              "name": "course_correction",
+              "value": "={{ $('Parse N1').item.json.course_correction }}",
+              "type": "string"
+            },
+            {
+              "id": "495aedb2-0ab8-444a-8688-a65df3e6eb7a",
+              "name": "idea_document",
+              "value": "={{ $('Parse N1').item.json.idea_document }}",
+              "type": "string"
+            },
+            {
+              "id": "589ca8c4-efa9-4f2a-aaee-5c298695efa6",
+              "name": "purpose_statement",
+              "value": "={{ $('Parse N1').item.json.purpose_statement }}",
+              "type": "string"
+            },
+            {
+              "id": "205fe98a-fc9b-475a-a838-439f25a8c104",
+              "name": "gpt_name",
+              "value": "={{ $('Parse N1').item.json.gpt_name }}",
+              "type": "string"
+            },
+            {
+              "id": "3903ffa9-54de-42d7-998e-59391f50f86f",
+              "name": "knowledge_report",
+              "value": "={{ $json.choices[0].message.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "a45d212a-181d-4e0a-94f0-3363cb68849b",
+      "name": "Parse N2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.2, \"max_tokens\": 8192, \"messages\": [   { \"role\": \"system\", \"content\": \"You are the Operationalizer. You transform a Knowledge Report into an executable, machine-ready Standard Operating Procedure (SOP) for a Custom GPT.\\n\\nYou execute an 8-step process IN ORDER, fully completing each step before moving to the next. You output ALL EIGHT STEPS in a single response. You do not skip steps. You do not compress. You do not truncate.\\n\\nTHE EIGHT STEPS:\\n\\n## STEP 1 \\u2014 Process Decomposition\\nBreak the GPT's main job into discrete, sequenced sub-processes. For each sub-process state: trigger, input, transformation, output.\\n\\n## STEP 2 \\u2014 Input/Output Schema\\nFor each sub-process, define the exact data shape: fields, types, required vs optional, formats, valid value ranges.\\n\\n## STEP 3 \\u2014 Decision Logic and Branching\\nSpecify every conditional in deterministic form: \\\"If [condition], then [action]; else [alternate action].\\\" Forbidden words in this step: \\\"consider\\\", \\\"may\\\", \\\"might\\\", \\\"could\\\", \\\"as appropriate\\\".\\n\\n## STEP 4 \\u2014 Domain Frameworks Embedded\\nFor each decision point in Step 3, name the specific framework, heuristic, or quality benchmark from the Knowledge Report being applied. Embed the framework's rule set inline. Do not reference it by name only.\\n\\n## STEP 5 \\u2014 Quality Validation Criteria\\nFor each output defined in Step 2, list the deterministic checks that must pass before the GPT emits it. Include: format checks, semantic checks, constraint checks, length checks.\\n\\n## STEP 6 \\u2014 Edge Case Handling\\nEnumerate predictable edge cases (empty input, ambiguous input, conflicting input, out-of-scope input, malformed input, hostile input) and the deterministic response to each.\\n\\n## STEP 7 \\u2014 Deterministic Tie-Breaking and Selection Rules\\nWhen multiple candidate outputs satisfy all validation, specify the deterministic selection rule. Default rule unless context dictates otherwise: \\\"Select the shortest candidate that preserves 100% of intent and satisfies all safety validation.\\\"\\n\\n## STEP 8 \\u2014 Master Operationalized Process (Final SOP)\\nConsolidate Steps 1\\u20137 into a single, formal, third-person SOP document. This is the final deliverable. It MUST:\\n- Read as a Standard Operating Procedure manual for a machine.\\n- Use third-person declarative voice (\\\"The system parses...\\\", \\\"The process selects...\\\", \\\"The assistant validates...\\\").\\n- Number all procedures (1.0, 1.1, 1.2, 2.0, ...).\\n- Include every constraint, framework, rule, and edge case defined in Steps 1\\u20137 in full.\\n\\nThe Step 8 SOP MUST NOT:\\n- Use second-person \\\"you\\\" language.\\n- Use system-prompt phrasing such as \\\"You are an AI\\\" or \\\"Your role is\\\".\\n- Summarize, compress, or truncate Steps 1\\u20137.\\n- Refer to earlier steps by step number (the SOP must stand alone).\\n\\nOUTPUT RULES (absolute):\\n- Output all 8 steps, in order, in a single response.\\n- Fully complete Step 7 before beginning Step 8.\\n- No preamble. Begin with \\\"## STEP 1 \\u2014 Process Decomposition\\\".\\n- No closing remarks after Step 8.\\n- Do not wrap the output in code fences.\\n\" },   { \"role\": \"user\", \"content\": `Purpose Statement:\\n` + $json.purpose_statement + `\\n\\nKnowledge Report:\\n` + $json.knowledge_report + `\\n\\nIdea Document:\\n` + $json.idea_document + `\\n\\nCourse Correction (may be empty \u2014 if non-empty, integrate these corrections into the SOP):\\n` + ($json.course_correction || '') } ]}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 180000
+        }
+      },
+      "id": "13cafe5a-d889-4b9e-a68c-a9fa5e82fa9a",
+      "name": "N3 \u00b7 Operationalizer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1440,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gemini API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "06820039-8395-468e-963a-a36c532c09e0",
+              "name": "raw_idea",
+              "value": "={{ $('Parse N2').item.json.raw_idea }}",
+              "type": "string"
+            },
+            {
+              "id": "49767afa-f5f8-4c60-b509-97fb70647b9f",
+              "name": "system_context",
+              "value": "={{ $('Parse N2').item.json.system_context }}",
+              "type": "string"
+            },
+            {
+              "id": "2b6ac53c-43b2-4fb9-89f2-ffc7cd8257e4",
+              "name": "course_correction",
+              "value": "={{ $('Parse N2').item.json.course_correction }}",
+              "type": "string"
+            },
+            {
+              "id": "2b3c9d4d-0d20-43b4-9b84-ce157cf6c51f",
+              "name": "idea_document",
+              "value": "={{ $('Parse N2').item.json.idea_document }}",
+              "type": "string"
+            },
+            {
+              "id": "d84d9f8c-bccf-4747-b761-ff96ed4f6ac6",
+              "name": "purpose_statement",
+              "value": "={{ $('Parse N2').item.json.purpose_statement }}",
+              "type": "string"
+            },
+            {
+              "id": "e0071a2b-0cb3-49a7-a25b-74691764d820",
+              "name": "gpt_name",
+              "value": "={{ $('Parse N2').item.json.gpt_name }}",
+              "type": "string"
+            },
+            {
+              "id": "a8d32016-913a-4a62-95b0-7efadd90595f",
+              "name": "knowledge_report",
+              "value": "={{ $('Parse N2').item.json.knowledge_report }}",
+              "type": "string"
+            },
+            {
+              "id": "945e8e00-a867-4565-b34c-540a7e7c5e06",
+              "name": "sop",
+              "value": "={{ $json.choices[0].message.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "38a78365-490a-41e7-90fa-3b9b7ef5b74f",
+      "name": "Parse N3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.2, \"max_tokens\": 8192, \"messages\": [   { \"role\": \"system\", \"content\": \"You are the Knowledge Base Master Builder. You transform a Purpose Statement, Knowledge Report, and Operationalized Process (SOP) into a single Knowledge Base file optimized for retrieval by a Custom GPT.\\n\\nYour optimization objective is INFORMATION DENSITY: Accuracy \\u00f7 Length. Every sentence must carry retrievable signal. Filler is forbidden.\\n\\nPROCESSING RULES:\\n- Regroup information semantically by theme and action, not by source document.\\n- Use Markdown headings (##, ###) so the GPT can navigate by section.\\n- For each domain-specific term the GPT will encounter, include a one-line definition.\\n- Embed INSTRUCTION TRIGGERS: explicit lines stating \\\"When [trigger], retrieve [section].\\\" This tells the GPT precisely when to pull a section into context.\\n- Use bullet lists for enumerable rules.\\n- Use Markdown tables for comparative or schema information.\\n- No prose paragraph exceeds 3 sentences.\\n\\nOUTPUT FORMAT:\\n\\n# Knowledge Base: [GPT Name]\\n\\n## Retrieval Triggers\\nA table mapping user-input triggers to KB sections.\\n\\n| Trigger | Retrieve Section |\\n|---------|------------------|\\n| ... | ## ... |\\n\\n## Core Definitions\\nEvery domain-specific term, one line each.\\n\\n## Domain Frameworks\\nEach framework as a named ### subsection containing: Purpose \\u00b7 When to apply \\u00b7 Steps \\u00b7 Success criteria.\\n\\n## Decision Rules\\nDeterministic if/then rules extracted from the SOP.\\n\\n## Quality Standards\\nThe validation criteria the GPT applies to its own outputs.\\n\\n## Edge Case Playbook\\nEach edge case with its deterministic response.\\n\\nOUTPUT RULES (absolute):\\n- No preamble. Begin with \\\"# Knowledge Base:\\\".\\n- Markdown only. No code fences wrapping the whole document.\\n- Dense, retrieval-optimized prose. No marketing tone. No conversational tone.\\n- Do not include the SOP verbatim. Restructure semantically.\\n\" },   { \"role\": \"user\", \"content\": `Purpose Statement:\\n` + $json.purpose_statement + `\\n\\nKnowledge Report:\\n` + $json.knowledge_report + `\\n\\nOperationalized Process (SOP):\\n` + $json.sop } ]}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 180000
+        }
+      },
+      "id": "3b4c23f9-6aa5-498c-9369-6751fdb10edd",
+      "name": "N4 \u00b7 KB Builder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1920,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gemini API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef2f2873-6cf9-4683-9d75-2fdcdb19e54a",
+              "name": "raw_idea",
+              "value": "={{ $('Parse N3').item.json.raw_idea }}",
+              "type": "string"
+            },
+            {
+              "id": "85acbb4e-54ab-414b-a0f8-897ad9405388",
+              "name": "system_context",
+              "value": "={{ $('Parse N3').item.json.system_context }}",
+              "type": "string"
+            },
+            {
+              "id": "26666270-c28f-4868-91bf-dfb6857b3ecc",
+              "name": "course_correction",
+              "value": "={{ $('Parse N3').item.json.course_correction }}",
+              "type": "string"
+            },
+            {
+              "id": "08bd432a-e0fc-4e78-8cee-55f8a4bb6eab",
+              "name": "idea_document",
+              "value": "={{ $('Parse N3').item.json.idea_document }}",
+              "type": "string"
+            },
+            {
+              "id": "d37e212f-a810-4aa3-8322-0d9a5d86a1a5",
+              "name": "purpose_statement",
+              "value": "={{ $('Parse N3').item.json.purpose_statement }}",
+              "type": "string"
+            },
+            {
+              "id": "72098a9c-08af-429c-9431-dd2d03509985",
+              "name": "gpt_name",
+              "value": "={{ $('Parse N3').item.json.gpt_name }}",
+              "type": "string"
+            },
+            {
+              "id": "5f1e80f2-9764-4333-83fe-8d48ead11753",
+              "name": "knowledge_report",
+              "value": "={{ $('Parse N3').item.json.knowledge_report }}",
+              "type": "string"
+            },
+            {
+              "id": "8fb49fc5-db37-48b6-a3a1-abcefaa65e02",
+              "name": "sop",
+              "value": "={{ $('Parse N3').item.json.sop }}",
+              "type": "string"
+            },
+            {
+              "id": "f149f7b6-6eb4-4a44-8584-a200a006c2d1",
+              "name": "kb_file",
+              "value": "={{ $json.choices[0].message.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "44cf8b42-65bc-49c0-b530-a9c761cc07fd",
+      "name": "Parse N4",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2160,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.2, \"max_tokens\": 8192, \"messages\": [   { \"role\": \"system\", \"content\": \"You are the MetaPrompt Synthesizer. You produce the final System Prompt for a Custom GPT, ready to paste into the GPT's \\\"Instructions\\\" field in the Configure tab.\\n\\nYou follow this exact template. You fill every section. You leave no placeholders.\\n\\n# [NAME_OF_AI_ASSISTANT]\\n\\n## Identity\\n[Concise statement of what this assistant is, directed at the model.]\\n\\n## Objective\\n[The single specific outcome this assistant must produce.]\\n\\n## Workflow\\nThe assistant follows this workflow on every invocation:\\n1. ...\\n2. ...\\n3. ...\\n(Continue with every step from the SOP.)\\n\\n## Domain Frameworks\\nThe assistant applies the following frameworks. For each, the assistant retrieves the corresponding section from its attached Knowledge Base file when the trigger fires:\\n- [Framework name] \\u2014 When [trigger], retrieve \\\"## [section]\\\" from the attached Knowledge Base.\\n\\n## Knowledge Base Retrieval Rules\\nThe assistant retrieves from its attached Knowledge Base file according to these rules:\\n- When the user input matches [pattern], retrieve [section].\\n\\n## Decision Rules\\n[Every deterministic if/then rule from the SOP, in declarative form.]\\n\\n## Quality Standards\\nBefore emitting any output, the assistant verifies:\\n- ...\\n\\n## Edge Case Handling\\n- If [edge case], the assistant [response].\\n\\n## Constraints\\nThe assistant MUST NOT:\\n- ...\\n\\n## Output Format\\n[The exact format of the assistant's deliverable, with schema or example.]\\n\\nOUTPUT RULES (absolute):\\n- Output ONLY the populated System Prompt, beginning with \\\"# [Name]\\\".\\n- No preamble, no closing remarks, no meta-commentary about your process.\\n- Fill every section. Do not leave bracketed placeholders.\\n- Reference the Knowledge Base as \\\"your attached Knowledge Base file\\\" (the user uploads the .md in the Configure tab).\\n- Do not wrap output in code fences.\\n\" },   { \"role\": \"user\", \"content\": `GPT Name (use exactly):\\n` + $json.gpt_name + `\\n\\nPurpose Statement:\\n` + $json.purpose_statement + `\\n\\nIdea Document:\\n` + $json.idea_document + `\\n\\nOperationalized Process (SOP):\\n` + $json.sop + `\\n\\nKnowledge Base (for retrieval rule alignment):\\n` + $json.kb_file } ]}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 180000
+        }
+      },
+      "id": "23f2c607-15fb-4534-aa59-e43861beb66a",
+      "name": "N5 \u00b7 MetaPrompt",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2400,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gemini API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d36234a4-0e2e-497b-95f7-c462ab700a8b",
+              "name": "raw_idea",
+              "value": "={{ $('Parse N4').item.json.raw_idea }}",
+              "type": "string"
+            },
+            {
+              "id": "60f45434-ed4a-40ee-9ed1-f8fd3480ef3c",
+              "name": "system_context",
+              "value": "={{ $('Parse N4').item.json.system_context }}",
+              "type": "string"
+            },
+            {
+              "id": "971858ca-9d20-4d67-86aa-4ec65a1f3575",
+              "name": "course_correction",
+              "value": "={{ $('Parse N4').item.json.course_correction }}",
+              "type": "string"
+            },
+            {
+              "id": "69b3ca13-392e-4ffa-b31f-ae5060764a30",
+              "name": "idea_document",
+              "value": "={{ $('Parse N4').item.json.idea_document }}",
+              "type": "string"
+            },
+            {
+              "id": "97830f8d-1770-450f-a4e4-fbf2158d1e28",
+              "name": "purpose_statement",
+              "value": "={{ $('Parse N4').item.json.purpose_statement }}",
+              "type": "string"
+            },
+            {
+              "id": "74ab64b2-c492-482b-b067-bc2d6206ac1d",
+              "name": "gpt_name",
+              "value": "={{ $('Parse N4').item.json.gpt_name }}",
+              "type": "string"
+            },
+            {
+              "id": "06130f56-1c6a-4ab0-a121-c196d827a719",
+              "name": "knowledge_report",
+              "value": "={{ $('Parse N4').item.json.knowledge_report }}",
+              "type": "string"
+            },
+            {
+              "id": "2ca5dd4c-bd95-4652-a067-8a8e5c02fa2b",
+              "name": "sop",
+              "value": "={{ $('Parse N4').item.json.sop }}",
+              "type": "string"
+            },
+            {
+              "id": "f4406efd-c510-488f-bf1c-24ac139a3662",
+              "name": "kb_file",
+              "value": "={{ $('Parse N4').item.json.kb_file }}",
+              "type": "string"
+            },
+            {
+              "id": "121fa301-961f-4e10-badd-ac424c1f69e1",
+              "name": "system_prompt",
+              "value": "={{ $json.choices[0].message.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "2933fbaa-6aab-4acb-9acc-f257e8d0bb78",
+      "name": "Parse N5",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2640,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.0, \"max_tokens\": 4096, \"messages\": [   { \"role\": \"system\", \"content\": \"You are the QA Auditor. You verify that the final System Prompt and SOP satisfy the original Idea/Constraints. You produce a structured audit verdict in JSON.\\n\\nCHECKS TO PERFORM:\\n\\n1. CONSTRAINT COVERAGE\\nFor each item in the Idea Document's \\\"Guardrails & Constraints\\\" section, verify it appears semantically in the System Prompt's Constraints section. List any missing constraints verbatim.\\n\\n2. STRATEGIC DRIFT\\nCompare the System Prompt's Objective and Workflow to the Purpose Statement. Flag scope, output, or intent drift.\\n\\n3. TOKEN SHORTCUTS\\nInspect the SOP for compression artifacts: \\\"etc.\\\", \\\"and so on\\\", \\\"...\\\", \\\"as needed\\\", \\\"various\\\", vague references to \\\"the framework\\\" or \\\"the process\\\" without naming it. Flag every instance with quoted text.\\n\\n4. FORBIDDEN FORMAT\\nVerify the SOP uses third-person SOP voice. Flag any \\\"You are an AI\\\", \\\"Your role is\\\", or second-person system-prompt phrasing in the SOP.\\n\\n5. INTERNAL CONSISTENCY\\nVerify that every section referenced in the System Prompt's \\\"Knowledge Base Retrieval Rules\\\" actually exists as a heading in the Knowledge Base.\\n\\n6. INPUT/OUTPUT FAITHFULNESS\\nVerify the System Prompt's \\\"Output Format\\\" matches the \\\"Outputs (Downstream Deliverables)\\\" section of the Idea Document.\\n\\nOUTPUT (JSON only \\u2014 no prose, no markdown fences, no commentary):\\n\\n{\\n  \\\"verdict\\\": \\\"PASS\\\" or \\\"FAIL\\\",\\n  \\\"checks\\\": {\\n    \\\"constraint_coverage\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"missing\\\": [] },\\n    \\\"strategic_drift\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"drifts\\\": [] },\\n    \\\"token_shortcuts\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"instances\\\": [] },\\n    \\\"forbidden_format\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"instances\\\": [] },\\n    \\\"internal_consistency\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"broken_references\\\": [] },\\n    \\\"io_faithfulness\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"mismatches\\\": [] }\\n  },\\n  \\\"course_correction_prompt\\\": \\\"\\\",\\n  \\\"tactical_library\\\": [\\n    { \\\"tactic\\\": \\\"\\\", \\\"use_when\\\": \\\"\\\", \\\"snippet\\\": \\\"\\\" }\\n  ]\\n}\\n\\nRULES:\\n- Output ONLY valid JSON. No code fences. No leading or trailing text.\\n- verdict is \\\"FAIL\\\" if any check status is \\\"FAIL\\\".\\n- course_correction_prompt: the exact text the user would send back to the Operationalizer to fix all failed checks. Empty string if verdict is PASS.\\n- tactical_library: 5 to 10 short steering snippets the user pastes mid-session if the deployed GPT drifts. Each tactic has: a short label, a use_when trigger, and the exact snippet text.\\n\" },   { \"role\": \"user\", \"content\": `Idea Document:\\n` + $json.idea_document + `\\n\\nPurpose Statement:\\n` + $json.purpose_statement + `\\n\\nOperationalized Process (SOP):\\n` + $json.sop + `\\n\\nKnowledge Base:\\n` + $json.kb_file + `\\n\\nSystem Prompt:\\n` + $json.system_prompt } ]}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 180000
+        }
+      },
+      "id": "38123e87-c016-486e-9a3f-86987900e0d2",
+      "name": "N6 \u00b7 QA Auditor",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2880,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gemini API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cc08a8a3-4db5-4e47-8bc5-d7ed964d9a48",
+              "name": "gpt_name",
+              "value": "={{ $('Parse N5').item.json.gpt_name }}",
+              "type": "string"
+            },
+            {
+              "id": "fc013172-d406-4c07-8ebc-e27697b17a53",
+              "name": "idea_document",
+              "value": "={{ $('Parse N5').item.json.idea_document }}",
+              "type": "string"
+            },
+            {
+              "id": "ef085c19-872e-4374-8742-9d621753aaf4",
+              "name": "purpose_statement",
+              "value": "={{ $('Parse N5').item.json.purpose_statement }}",
+              "type": "string"
+            },
+            {
+              "id": "82e3c3b2-3178-4c5a-b490-6435e5d7698c",
+              "name": "knowledge_report",
+              "value": "={{ $('Parse N5').item.json.knowledge_report }}",
+              "type": "string"
+            },
+            {
+              "id": "4610ef54-b4ec-4158-9536-e2cc2befd69a",
+              "name": "sop",
+              "value": "={{ $('Parse N5').item.json.sop }}",
+              "type": "string"
+            },
+            {
+              "id": "aba97dc3-6431-4687-ad89-294b19547862",
+              "name": "kb_file",
+              "value": "={{ $('Parse N5').item.json.kb_file }}",
+              "type": "string"
+            },
+            {
+              "id": "7cf2b837-a698-47b5-ab1c-222b9a097c74",
+              "name": "system_prompt",
+              "value": "={{ $('Parse N5').item.json.system_prompt }}",
+              "type": "string"
+            },
+            {
+              "id": "10ea8a71-b84e-4f84-a276-5f2431ae5f78",
+              "name": "audit_raw",
+              "value": "={{ $json.choices[0].message.content }}",
+              "type": "string"
+            },
+            {
+              "id": "82a11fa1-ff4d-49a3-81cc-94f2f0b45e6b",
+              "name": "audit",
+              "value": "={{ (() => { const s = $json.choices[0].message.content || ''; const m = s.match(/\\{[\\s\\S]*\\}/); const j = m ? m[0] : s.replace(/^```json\\n?/i,'').replace(/```$/,'').trim(); try { return JSON.parse(j); } catch (e) { return { verdict: 'PARSE_ERROR', error: e.message, raw: s }; } })() }}",
+              "type": "object"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "a7782d26-35f8-4439-8e24-2fe4217a7cc8",
+      "name": "Parse N6",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3120,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, gpt_name: $json.gpt_name, idea_document: $json.idea_document, purpose_statement: $json.purpose_statement, knowledge_report: $json.knowledge_report, sop: $json.sop, kb_file: $json.kb_file, system_prompt: $json.system_prompt, audit: $json.audit } }}",
+        "options": {}
+      },
+      "id": "c3f4ca68-02b4-4cad-85cf-2c505a2e1e04",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        3360,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook In": {
+      "main": [
+        [
+          {
+            "node": "Initial Setup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initial Setup": {
+      "main": [
+        [
+          {
+            "node": "N1 \u00b7 Architect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N1 \u00b7 Architect": {
+      "main": [
+        [
+          {
+            "node": "Parse N1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse N1": {
+      "main": [
+        [
+          {
+            "node": "N2 \u00b7 Domain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N2 \u00b7 Domain": {
+      "main": [
+        [
+          {
+            "node": "Parse N2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse N2": {
+      "main": [
+        [
+          {
+            "node": "N3 \u00b7 Operationalizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N3 \u00b7 Operationalizer": {
+      "main": [
+        [
+          {
+            "node": "Parse N3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse N3": {
+      "main": [
+        [
+          {
+            "node": "N4 \u00b7 KB Builder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N4 \u00b7 KB Builder": {
+      "main": [
+        [
+          {
+            "node": "Parse N4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse N4": {
+      "main": [
+        [
+          {
+            "node": "N5 \u00b7 MetaPrompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N5 \u00b7 MetaPrompt": {
+      "main": [
+        [
+          {
+            "node": "Parse N5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse N5": {
+      "main": [
+        [
+          {
+            "node": "N6 \u00b7 QA Auditor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N6 \u00b7 QA Auditor": {
+      "main": [
+        [
+          {
+            "node": "Parse N6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse N6": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d4323d9d-72d0-4de6-b653-30be54a1c555",
+  "id": "fffec777-3194-4497-a704-6134540f607d",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

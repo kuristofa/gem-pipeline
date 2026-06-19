@@ -1,0 +1,45 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python (for build_workflow.py)
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Node (in case you add tooling later)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Secrets — never commit
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+secrets.json
+
+# Build output / temp
+*.tmp
+*.log
+*.bak
+
+# n8n local data (if you ever export from a self-hosted instance into this repo)
+.n8n/
+
+# OS-level archives that shouldn't be tracked
+*.zip
+*.tar
+*.tar.gz
