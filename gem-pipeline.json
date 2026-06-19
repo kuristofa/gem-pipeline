@@ -10,7 +10,7 @@
           "allowedOrigins": "*"
         }
       },
-      "id": "a118a87c-96fc-4f65-9106-babf43da6eb7",
+      "id": "91d96824-261e-42cc-9fee-78bdd267d3eb",
       "name": "Webhook In",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
@@ -18,7 +18,7 @@
         0,
         300
       ],
-      "webhookId": "ff16b1a1-25b2-4186-81c5-710849541e36"
+      "webhookId": "3151d016-8771-4f52-ae75-0058d67c1cc2"
     },
     {
       "parameters": {
@@ -27,19 +27,19 @@
         "assignments": {
           "assignments": [
             {
-              "id": "77c95f63-d3f5-4491-85ba-df27cb8539c5",
+              "id": "9d21bc99-b4a3-41bc-bada-57de493de753",
               "name": "raw_idea",
               "value": "={{ $json.body.raw_idea }}",
               "type": "string"
             },
             {
-              "id": "0f19c2ab-19ea-43dd-98b2-1d92897e5635",
+              "id": "17615238-d159-4cf7-8c88-6700415e990e",
               "name": "system_context",
               "value": "={{ $json.body.system_context || '' }}",
               "type": "string"
             },
             {
-              "id": "a174dc4f-a1ab-47bd-a806-925fe1a653e6",
+              "id": "0815b6a4-4ce5-44fc-babb-4132fd066a21",
               "name": "course_correction",
               "value": "={{ $json.body.course_correction || '' }}",
               "type": "string"
@@ -49,7 +49,7 @@
         "includeOtherFields": false,
         "options": {}
       },
-      "id": "588fee6c-050f-4483-8caf-30ae5db0a157",
+      "id": "091b41fb-42c3-43ad-801f-a8048be17cb1",
       "name": "Initial Setup",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
@@ -76,7 +76,7 @@
         "sendBody": true,
         "contentType": "json",
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.2, \"max_tokens\": 4096, \"messages\": [   { \"role\": \"system\", \"content\": \"You are a Master Systems Architect and AI Operations Engineer. You apply strict Systems Thinking (the Input-Process-Output model) to clarify a raw idea into a precise operational blueprint for Custom GPT construction.\\n\\nYou treat each GPT as a highly focused operational node. If a System Context is provided, do not assign the GPT tasks that belong to other nodes in that system. If the GPT is standalone, ensure it is fully self-sufficient.\\n\\nYou produce exactly two artifacts and nothing else.\\n\\nPART A \\u2014 IDEA DOCUMENT (use this exact structure and headings):\\n\\nTarget GPT: [Name of GPT]\\nCore Role: [1-2 sentences defining its exact operational purpose]\\nMain Job (Processing):\\n- [Actionable task 1]\\n- [Actionable task 2]\\n- [Internal logic, frameworks, or decisions it must apply]\\nInputs (Upstream Dependencies):\\n- [Exactly what data/variables it receives from the user or the previous system node]\\nOutputs (Downstream Deliverables):\\n- [Exactly what it must produce, including specific formatting, tables, or data structures]\\nGuardrails & Constraints:\\n- [What it MUST NOT do]\\n- [Limits on length, tone, or format]\\n\\nPART B \\u2014 PURPOSE STATEMENT (one sentence, this exact template):\\n\\n\\\"I want to create a Custom GPT that does [XYZ] to produce [Output] within [Constraints] in order to [Goal].\\\"\\n\\nOUTPUT RULES (absolute):\\n- No conversational preamble.\\n- No closing remarks or meta-commentary.\\n- Begin immediately with the line \\\"Target GPT:\\\".\\n- Separate Part A and Part B with the exact delimiter line: ---PURPOSE---\\n- Do not wrap the output in code fences.\\n\" },   { \"role\": \"user\", \"content\": `Raw Idea / Goal:\\n` + $json.raw_idea + `\\n\\nSystem Context (may be empty):\\n` + ($json.system_context || '') } ]}) }}",
+        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.2, \"max_tokens\": 4096, \"reasoning_effort\": \"none\", \"messages\": [   { \"role\": \"system\", \"content\": \"You are a Master Systems Architect and AI Operations Engineer. You apply strict Systems Thinking (the Input-Process-Output model) to clarify a raw idea into a precise operational blueprint for Custom GPT construction.\\n\\nYou treat each GPT as a highly focused operational node. If a System Context is provided, do not assign the GPT tasks that belong to other nodes in that system. If the GPT is standalone, ensure it is fully self-sufficient.\\n\\nYou produce exactly two artifacts and nothing else.\\n\\nPART A \\u2014 IDEA DOCUMENT (use this exact structure and headings):\\n\\nTarget GPT: [Name of GPT]\\nCore Role: [1-2 sentences defining its exact operational purpose]\\nMain Job (Processing):\\n- [Actionable task 1]\\n- [Actionable task 2]\\n- [Internal logic, frameworks, or decisions it must apply]\\nInputs (Upstream Dependencies):\\n- [Exactly what data/variables it receives from the user or the previous system node]\\nOutputs (Downstream Deliverables):\\n- [Exactly what it must produce, including specific formatting, tables, or data structures]\\nGuardrails & Constraints:\\n- [What it MUST NOT do]\\n- [Limits on length, tone, or format]\\n\\nPART B \\u2014 PURPOSE STATEMENT (one sentence, this exact template):\\n\\n\\\"I want to create a Custom GPT that does [XYZ] to produce [Output] within [Constraints] in order to [Goal].\\\"\\n\\nOUTPUT RULES (absolute):\\n- No conversational preamble.\\n- No closing remarks or meta-commentary.\\n- Begin immediately with the line \\\"Target GPT:\\\".\\n- Separate Part A and Part B with the exact delimiter line: ---PURPOSE---\\n- Do not wrap the output in code fences.\\n\" },   { \"role\": \"user\", \"content\": `Raw Idea / Goal:\\n` + $json.raw_idea + `\\n\\nSystem Context (may be empty):\\n` + ($json.system_context || '') } ]}) }}",
         "options": {
           "response": {
             "response": {
@@ -86,7 +86,7 @@
           "timeout": 180000
         }
       },
-      "id": "febe6c31-32f2-47a2-aad6-0182f6332617",
+      "id": "daa26493-6fff-4a8b-999b-66af44c10d6d",
       "name": "N1 \u00b7 Architect",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -108,43 +108,43 @@
         "assignments": {
           "assignments": [
             {
-              "id": "759939b3-d04e-4505-a3c8-e3b279d3fb4c",
+              "id": "1ada2241-ea13-4c37-9c4e-72f0984ee9b8",
               "name": "raw_idea",
               "value": "={{ $('Initial Setup').item.json.raw_idea }}",
               "type": "string"
             },
             {
-              "id": "ffea0832-f581-4c37-aa42-a633e33ad444",
+              "id": "fcc0a2c2-6fac-4b0d-84e0-b97ec91bbc4a",
               "name": "system_context",
               "value": "={{ $('Initial Setup').item.json.system_context }}",
               "type": "string"
             },
             {
-              "id": "6e4e80bc-ce18-4f29-86fe-0ba51f0ca313",
+              "id": "01cdb611-8922-4dc0-afa0-7eac90f52752",
               "name": "course_correction",
               "value": "={{ $('Initial Setup').item.json.course_correction }}",
               "type": "string"
             },
             {
-              "id": "eef154ee-50c5-47d9-8aee-f53911a60be1",
+              "id": "6eb470f6-9bd5-4051-a558-ecacb115e46a",
               "name": "n1_raw",
               "value": "={{ $json.choices[0].message.content }}",
               "type": "string"
             },
             {
-              "id": "8afcea35-d9db-48ae-92bd-3f522384e6dd",
+              "id": "c74684c4-f949-4386-a8bb-d55f49b421bd",
               "name": "idea_document",
               "value": "={{ $json.choices[0].message.content.split('---PURPOSE---')[0].trim() }}",
               "type": "string"
             },
             {
-              "id": "1f1becff-d8ac-4734-8378-1362a18aec82",
+              "id": "8345832b-3bd7-413c-8c8a-a08f8e475c96",
               "name": "purpose_statement",
               "value": "={{ ($json.choices[0].message.content.split('---PURPOSE---')[1] || '').trim() }}",
               "type": "string"
             },
             {
-              "id": "73df012d-79bb-4e7c-a1d6-a29e2bdd9695",
+              "id": "60d9e40e-d7e8-4542-87e5-9b740bb3579a",
               "name": "gpt_name",
               "value": "={{ (($json.choices[0].message.content.match(/Target GPT:\\s*(.+)/) || [])[1] || 'Custom GPT').trim() }}",
               "type": "string"
@@ -154,7 +154,7 @@
         "includeOtherFields": false,
         "options": {}
       },
-      "id": "dd543f16-eca2-4aed-9ca1-8921f85578c8",
+      "id": "a035d4dd-8b66-40c9-b30e-af92a36b7d84",
       "name": "Parse N1",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
@@ -181,7 +181,7 @@
         "sendBody": true,
         "contentType": "json",
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.3, \"max_tokens\": 4096, \"messages\": [   { \"role\": \"system\", \"content\": \"You produce a Knowledge Report analyzing the domain of an AI Assistant's purpose statement. You operate in two phases.\\n\\nPHASE 1 \\u2014 EXPERT DOMAIN RESOURCES\\nMap the premier methodologies, frameworks, and expert practices in the field. Cover:\\n- Industry-standard frameworks (name them specifically).\\n- Proven expert workflows.\\n- Best-in-class tools and approaches.\\n- Established quality benchmarks.\\n\\nPHASE 2 \\u2014 AI-EXECUTABLE STRATEGY\\nFrom Phase 1, extract ONLY the intellectual components that add value beyond basic LLM capabilities:\\n- Strategic frameworks that guide decision-making.\\n- Domain-specific analytical methods.\\n- Expert heuristics and rules of thumb.\\n- Quality standards specific to the field.\\n\\nYou EXCLUDE general LLM capabilities such as language understanding, conversation management, or basic logical reasoning.\\n\\nOUTPUT FORMAT (Markdown, these exact sections, in this order):\\n\\n# Knowledge Report: [GPT Name]\\n\\n## 1. Core Domain Knowledge\\n### Critical principles unique to this field\\n### Expert-level decision criteria\\n### Field-specific evaluation methods\\n\\n## 2. Strategic Process\\n### Key decision points and their triggers\\n### Essential domain questions to consider\\n### Critical success factors\\n\\n## 3. Quality Standards\\n### Domain-specific benchmarks\\n### Industry-standard quality indicators\\n### Field-recognized best practices\\n\\nOUTPUT RULES (absolute):\\n- No preamble. Begin with \\\"# Knowledge Report:\\\".\\n- No closing remarks.\\n- Every bullet is field-specific and concrete. Generic AI advice is forbidden.\\n- Name frameworks explicitly (e.g., \\\"Cynefin\\\", \\\"Wardley Mapping\\\", \\\"Jobs-To-Be-Done\\\"), not generically (\\\"a framework for thinking\\\").\\n- Do not wrap the output in code fences.\\n\" },   { \"role\": \"user\", \"content\": `Purpose Statement:\\n` + $json.purpose_statement + `\\n\\nIdea Document (for context):\\n` + $json.idea_document } ]}) }}",
+        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.3, \"max_tokens\": 4096, \"reasoning_effort\": \"none\", \"messages\": [   { \"role\": \"system\", \"content\": \"You produce a Knowledge Report analyzing the domain of an AI Assistant's purpose statement. You operate in two phases.\\n\\nPHASE 1 \\u2014 EXPERT DOMAIN RESOURCES\\nMap the premier methodologies, frameworks, and expert practices in the field. Cover:\\n- Industry-standard frameworks (name them specifically).\\n- Proven expert workflows.\\n- Best-in-class tools and approaches.\\n- Established quality benchmarks.\\n\\nPHASE 2 \\u2014 AI-EXECUTABLE STRATEGY\\nFrom Phase 1, extract ONLY the intellectual components that add value beyond basic LLM capabilities:\\n- Strategic frameworks that guide decision-making.\\n- Domain-specific analytical methods.\\n- Expert heuristics and rules of thumb.\\n- Quality standards specific to the field.\\n\\nYou EXCLUDE general LLM capabilities such as language understanding, conversation management, or basic logical reasoning.\\n\\nOUTPUT FORMAT (Markdown, these exact sections, in this order):\\n\\n# Knowledge Report: [GPT Name]\\n\\n## 1. Core Domain Knowledge\\n### Critical principles unique to this field\\n### Expert-level decision criteria\\n### Field-specific evaluation methods\\n\\n## 2. Strategic Process\\n### Key decision points and their triggers\\n### Essential domain questions to consider\\n### Critical success factors\\n\\n## 3. Quality Standards\\n### Domain-specific benchmarks\\n### Industry-standard quality indicators\\n### Field-recognized best practices\\n\\nOUTPUT RULES (absolute):\\n- No preamble. Begin with \\\"# Knowledge Report:\\\".\\n- No closing remarks.\\n- Every bullet is field-specific and concrete. Generic AI advice is forbidden.\\n- Name frameworks explicitly (e.g., \\\"Cynefin\\\", \\\"Wardley Mapping\\\", \\\"Jobs-To-Be-Done\\\"), not generically (\\\"a framework for thinking\\\").\\n- Do not wrap the output in code fences.\\n\" },   { \"role\": \"user\", \"content\": `Purpose Statement:\\n` + $json.purpose_statement + `\\n\\nIdea Document (for context):\\n` + $json.idea_document } ]}) }}",
         "options": {
           "response": {
             "response": {
@@ -191,7 +191,7 @@
           "timeout": 180000
         }
       },
-      "id": "b17d9d70-ecc4-4686-ae5d-9d4a030d589d",
+      "id": "c85b43db-b276-44e3-8206-847dfa14c958",
       "name": "N2 \u00b7 Domain",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -213,43 +213,43 @@
         "assignments": {
           "assignments": [
             {
-              "id": "a4b720f3-94d5-477c-913f-856395e3bee2",
+              "id": "13554e9a-9e9f-47e1-b270-c86e8016cd6d",
               "name": "raw_idea",
               "value": "={{ $('Parse N1').item.json.raw_idea }}",
               "type": "string"
             },
             {
-              "id": "36c9657d-2f87-4b19-b691-08194f3ebd39",
+              "id": "b12edca6-fed5-4795-9fc9-8a2eac98c526",
               "name": "system_context",
               "value": "={{ $('Parse N1').item.json.system_context }}",
               "type": "string"
             },
             {
-              "id": "3999844f-a924-446a-b972-e26671e01b15",
+              "id": "229400ac-71e9-4322-bd4a-05ce95996d98",
               "name": "course_correction",
               "value": "={{ $('Parse N1').item.json.course_correction }}",
               "type": "string"
             },
             {
-              "id": "495aedb2-0ab8-444a-8688-a65df3e6eb7a",
+              "id": "d86f805b-1f34-4053-960d-25c1df5663ec",
               "name": "idea_document",
               "value": "={{ $('Parse N1').item.json.idea_document }}",
               "type": "string"
             },
             {
-              "id": "589ca8c4-efa9-4f2a-aaee-5c298695efa6",
+              "id": "5af11d2b-9fd4-44dc-8887-085c3c709517",
               "name": "purpose_statement",
               "value": "={{ $('Parse N1').item.json.purpose_statement }}",
               "type": "string"
             },
             {
-              "id": "205fe98a-fc9b-475a-a838-439f25a8c104",
+              "id": "6b1dac07-6358-40e9-8ec9-55d00ba4253b",
               "name": "gpt_name",
               "value": "={{ $('Parse N1').item.json.gpt_name }}",
               "type": "string"
             },
             {
-              "id": "3903ffa9-54de-42d7-998e-59391f50f86f",
+              "id": "af9fe3e6-d291-46ca-8369-94de90efee00",
               "name": "knowledge_report",
               "value": "={{ $json.choices[0].message.content }}",
               "type": "string"
@@ -259,7 +259,7 @@
         "includeOtherFields": false,
         "options": {}
       },
-      "id": "a45d212a-181d-4e0a-94f0-3363cb68849b",
+      "id": "37353dc1-a7e9-4da2-ac1d-3fc44da71bf0",
       "name": "Parse N2",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
@@ -286,7 +286,7 @@
         "sendBody": true,
         "contentType": "json",
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.2, \"max_tokens\": 8192, \"messages\": [   { \"role\": \"system\", \"content\": \"You are the Operationalizer. You transform a Knowledge Report into an executable, machine-ready Standard Operating Procedure (SOP) for a Custom GPT.\\n\\nYou execute an 8-step process IN ORDER, fully completing each step before moving to the next. You output ALL EIGHT STEPS in a single response. You do not skip steps. You do not compress. You do not truncate.\\n\\nTHE EIGHT STEPS:\\n\\n## STEP 1 \\u2014 Process Decomposition\\nBreak the GPT's main job into discrete, sequenced sub-processes. For each sub-process state: trigger, input, transformation, output.\\n\\n## STEP 2 \\u2014 Input/Output Schema\\nFor each sub-process, define the exact data shape: fields, types, required vs optional, formats, valid value ranges.\\n\\n## STEP 3 \\u2014 Decision Logic and Branching\\nSpecify every conditional in deterministic form: \\\"If [condition], then [action]; else [alternate action].\\\" Forbidden words in this step: \\\"consider\\\", \\\"may\\\", \\\"might\\\", \\\"could\\\", \\\"as appropriate\\\".\\n\\n## STEP 4 \\u2014 Domain Frameworks Embedded\\nFor each decision point in Step 3, name the specific framework, heuristic, or quality benchmark from the Knowledge Report being applied. Embed the framework's rule set inline. Do not reference it by name only.\\n\\n## STEP 5 \\u2014 Quality Validation Criteria\\nFor each output defined in Step 2, list the deterministic checks that must pass before the GPT emits it. Include: format checks, semantic checks, constraint checks, length checks.\\n\\n## STEP 6 \\u2014 Edge Case Handling\\nEnumerate predictable edge cases (empty input, ambiguous input, conflicting input, out-of-scope input, malformed input, hostile input) and the deterministic response to each.\\n\\n## STEP 7 \\u2014 Deterministic Tie-Breaking and Selection Rules\\nWhen multiple candidate outputs satisfy all validation, specify the deterministic selection rule. Default rule unless context dictates otherwise: \\\"Select the shortest candidate that preserves 100% of intent and satisfies all safety validation.\\\"\\n\\n## STEP 8 \\u2014 Master Operationalized Process (Final SOP)\\nConsolidate Steps 1\\u20137 into a single, formal, third-person SOP document. This is the final deliverable. It MUST:\\n- Read as a Standard Operating Procedure manual for a machine.\\n- Use third-person declarative voice (\\\"The system parses...\\\", \\\"The process selects...\\\", \\\"The assistant validates...\\\").\\n- Number all procedures (1.0, 1.1, 1.2, 2.0, ...).\\n- Include every constraint, framework, rule, and edge case defined in Steps 1\\u20137 in full.\\n\\nThe Step 8 SOP MUST NOT:\\n- Use second-person \\\"you\\\" language.\\n- Use system-prompt phrasing such as \\\"You are an AI\\\" or \\\"Your role is\\\".\\n- Summarize, compress, or truncate Steps 1\\u20137.\\n- Refer to earlier steps by step number (the SOP must stand alone).\\n\\nOUTPUT RULES (absolute):\\n- Output all 8 steps, in order, in a single response.\\n- Fully complete Step 7 before beginning Step 8.\\n- No preamble. Begin with \\\"## STEP 1 \\u2014 Process Decomposition\\\".\\n- No closing remarks after Step 8.\\n- Do not wrap the output in code fences.\\n\" },   { \"role\": \"user\", \"content\": `Purpose Statement:\\n` + $json.purpose_statement + `\\n\\nKnowledge Report:\\n` + $json.knowledge_report + `\\n\\nIdea Document:\\n` + $json.idea_document + `\\n\\nCourse Correction (may be empty \u2014 if non-empty, integrate these corrections into the SOP):\\n` + ($json.course_correction || '') } ]}) }}",
+        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.2, \"max_tokens\": 8192, \"reasoning_effort\": \"none\", \"messages\": [   { \"role\": \"system\", \"content\": \"You are the Operationalizer. You transform a Knowledge Report into an executable, machine-ready Standard Operating Procedure (SOP) for a Custom GPT.\\n\\nYou execute an 8-step process IN ORDER, fully completing each step before moving to the next. You output ALL EIGHT STEPS in a single response. You do not skip steps. You do not compress. You do not truncate.\\n\\nTHE EIGHT STEPS:\\n\\n## STEP 1 \\u2014 Process Decomposition\\nBreak the GPT's main job into discrete, sequenced sub-processes. For each sub-process state: trigger, input, transformation, output.\\n\\n## STEP 2 \\u2014 Input/Output Schema\\nFor each sub-process, define the exact data shape: fields, types, required vs optional, formats, valid value ranges.\\n\\n## STEP 3 \\u2014 Decision Logic and Branching\\nSpecify every conditional in deterministic form: \\\"If [condition], then [action]; else [alternate action].\\\" Forbidden words in this step: \\\"consider\\\", \\\"may\\\", \\\"might\\\", \\\"could\\\", \\\"as appropriate\\\".\\n\\n## STEP 4 \\u2014 Domain Frameworks Embedded\\nFor each decision point in Step 3, name the specific framework, heuristic, or quality benchmark from the Knowledge Report being applied. Embed the framework's rule set inline. Do not reference it by name only.\\n\\n## STEP 5 \\u2014 Quality Validation Criteria\\nFor each output defined in Step 2, list the deterministic checks that must pass before the GPT emits it. Include: format checks, semantic checks, constraint checks, length checks.\\n\\n## STEP 6 \\u2014 Edge Case Handling\\nEnumerate predictable edge cases (empty input, ambiguous input, conflicting input, out-of-scope input, malformed input, hostile input) and the deterministic response to each.\\n\\n## STEP 7 \\u2014 Deterministic Tie-Breaking and Selection Rules\\nWhen multiple candidate outputs satisfy all validation, specify the deterministic selection rule. Default rule unless context dictates otherwise: \\\"Select the shortest candidate that preserves 100% of intent and satisfies all safety validation.\\\"\\n\\n## STEP 8 \\u2014 Master Operationalized Process (Final SOP)\\nConsolidate Steps 1\\u20137 into a single, formal, third-person SOP document. This is the final deliverable. It MUST:\\n- Read as a Standard Operating Procedure manual for a machine.\\n- Use third-person declarative voice (\\\"The system parses...\\\", \\\"The process selects...\\\", \\\"The assistant validates...\\\").\\n- Number all procedures (1.0, 1.1, 1.2, 2.0, ...).\\n- Include every constraint, framework, rule, and edge case defined in Steps 1\\u20137 in full.\\n\\nThe Step 8 SOP MUST NOT:\\n- Use second-person \\\"you\\\" language.\\n- Use system-prompt phrasing such as \\\"You are an AI\\\" or \\\"Your role is\\\".\\n- Summarize, compress, or truncate Steps 1\\u20137.\\n- Refer to earlier steps by step number (the SOP must stand alone).\\n\\nOUTPUT RULES (absolute):\\n- Output all 8 steps, in order, in a single response.\\n- Fully complete Step 7 before beginning Step 8.\\n- No preamble. Begin with \\\"## STEP 1 \\u2014 Process Decomposition\\\".\\n- No closing remarks after Step 8.\\n- Do not wrap the output in code fences.\\n\" },   { \"role\": \"user\", \"content\": `Purpose Statement:\\n` + $json.purpose_statement + `\\n\\nKnowledge Report:\\n` + $json.knowledge_report + `\\n\\nIdea Document:\\n` + $json.idea_document + `\\n\\nCourse Correction (may be empty \u2014 if non-empty, integrate these corrections into the SOP):\\n` + ($json.course_correction || '') } ]}) }}",
         "options": {
           "response": {
             "response": {
@@ -296,7 +296,7 @@
           "timeout": 180000
         }
       },
-      "id": "13cafe5a-d889-4b9e-a68c-a9fa5e82fa9a",
+      "id": "3a0bf8b3-17e1-4c90-b3c8-fa9f88cbc3a9",
       "name": "N3 \u00b7 Operationalizer",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -318,49 +318,49 @@
         "assignments": {
           "assignments": [
             {
-              "id": "06820039-8395-468e-963a-a36c532c09e0",
+              "id": "ada74eb7-5396-4f90-9f3f-60491dc6fa1e",
               "name": "raw_idea",
               "value": "={{ $('Parse N2').item.json.raw_idea }}",
               "type": "string"
             },
             {
-              "id": "49767afa-f5f8-4c60-b509-97fb70647b9f",
+              "id": "6afce9f6-ee9b-407f-9443-ae43981e6c1b",
               "name": "system_context",
               "value": "={{ $('Parse N2').item.json.system_context }}",
               "type": "string"
             },
             {
-              "id": "2b6ac53c-43b2-4fb9-89f2-ffc7cd8257e4",
+              "id": "cc0393f7-62a9-4b07-848e-19096272d88a",
               "name": "course_correction",
               "value": "={{ $('Parse N2').item.json.course_correction }}",
               "type": "string"
             },
             {
-              "id": "2b3c9d4d-0d20-43b4-9b84-ce157cf6c51f",
+              "id": "9e58ca8d-aee2-4688-9bff-3433422761bb",
               "name": "idea_document",
               "value": "={{ $('Parse N2').item.json.idea_document }}",
               "type": "string"
             },
             {
-              "id": "d84d9f8c-bccf-4747-b761-ff96ed4f6ac6",
+              "id": "652e8f01-5c9f-419a-b194-756d792a5297",
               "name": "purpose_statement",
               "value": "={{ $('Parse N2').item.json.purpose_statement }}",
               "type": "string"
             },
             {
-              "id": "e0071a2b-0cb3-49a7-a25b-74691764d820",
+              "id": "3e98c6d1-9ee4-4829-8776-d08294217654",
               "name": "gpt_name",
               "value": "={{ $('Parse N2').item.json.gpt_name }}",
               "type": "string"
             },
             {
-              "id": "a8d32016-913a-4a62-95b0-7efadd90595f",
+              "id": "a0919bdb-62a9-4bf7-a106-6529b0e98892",
               "name": "knowledge_report",
               "value": "={{ $('Parse N2').item.json.knowledge_report }}",
               "type": "string"
             },
             {
-              "id": "945e8e00-a867-4565-b34c-540a7e7c5e06",
+              "id": "d151bd5f-0e6d-48ec-b3e5-c9ce1dcc9bb9",
               "name": "sop",
               "value": "={{ $json.choices[0].message.content }}",
               "type": "string"
@@ -370,7 +370,7 @@
         "includeOtherFields": false,
         "options": {}
       },
-      "id": "38a78365-490a-41e7-90fa-3b9b7ef5b74f",
+      "id": "8ae8ae80-7c49-4873-a77b-57486a665518",
       "name": "Parse N3",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
@@ -397,7 +397,7 @@
         "sendBody": true,
         "contentType": "json",
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.2, \"max_tokens\": 8192, \"messages\": [   { \"role\": \"system\", \"content\": \"You are the Knowledge Base Master Builder. You transform a Purpose Statement, Knowledge Report, and Operationalized Process (SOP) into a single Knowledge Base file optimized for retrieval by a Custom GPT.\\n\\nYour optimization objective is INFORMATION DENSITY: Accuracy \\u00f7 Length. Every sentence must carry retrievable signal. Filler is forbidden.\\n\\nPROCESSING RULES:\\n- Regroup information semantically by theme and action, not by source document.\\n- Use Markdown headings (##, ###) so the GPT can navigate by section.\\n- For each domain-specific term the GPT will encounter, include a one-line definition.\\n- Embed INSTRUCTION TRIGGERS: explicit lines stating \\\"When [trigger], retrieve [section].\\\" This tells the GPT precisely when to pull a section into context.\\n- Use bullet lists for enumerable rules.\\n- Use Markdown tables for comparative or schema information.\\n- No prose paragraph exceeds 3 sentences.\\n\\nOUTPUT FORMAT:\\n\\n# Knowledge Base: [GPT Name]\\n\\n## Retrieval Triggers\\nA table mapping user-input triggers to KB sections.\\n\\n| Trigger | Retrieve Section |\\n|---------|------------------|\\n| ... | ## ... |\\n\\n## Core Definitions\\nEvery domain-specific term, one line each.\\n\\n## Domain Frameworks\\nEach framework as a named ### subsection containing: Purpose \\u00b7 When to apply \\u00b7 Steps \\u00b7 Success criteria.\\n\\n## Decision Rules\\nDeterministic if/then rules extracted from the SOP.\\n\\n## Quality Standards\\nThe validation criteria the GPT applies to its own outputs.\\n\\n## Edge Case Playbook\\nEach edge case with its deterministic response.\\n\\nOUTPUT RULES (absolute):\\n- No preamble. Begin with \\\"# Knowledge Base:\\\".\\n- Markdown only. No code fences wrapping the whole document.\\n- Dense, retrieval-optimized prose. No marketing tone. No conversational tone.\\n- Do not include the SOP verbatim. Restructure semantically.\\n\" },   { \"role\": \"user\", \"content\": `Purpose Statement:\\n` + $json.purpose_statement + `\\n\\nKnowledge Report:\\n` + $json.knowledge_report + `\\n\\nOperationalized Process (SOP):\\n` + $json.sop } ]}) }}",
+        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.2, \"max_tokens\": 8192, \"reasoning_effort\": \"none\", \"messages\": [   { \"role\": \"system\", \"content\": \"You are the Knowledge Base Master Builder. You transform a Purpose Statement, Knowledge Report, and Operationalized Process (SOP) into a single Knowledge Base file optimized for retrieval by a Custom GPT.\\n\\nYour optimization objective is INFORMATION DENSITY: Accuracy \\u00f7 Length. Every sentence must carry retrievable signal. Filler is forbidden.\\n\\nPROCESSING RULES:\\n- Regroup information semantically by theme and action, not by source document.\\n- Use Markdown headings (##, ###) so the GPT can navigate by section.\\n- For each domain-specific term the GPT will encounter, include a one-line definition.\\n- Embed INSTRUCTION TRIGGERS: explicit lines stating \\\"When [trigger], retrieve [section].\\\" This tells the GPT precisely when to pull a section into context.\\n- Use bullet lists for enumerable rules.\\n- Use Markdown tables for comparative or schema information.\\n- No prose paragraph exceeds 3 sentences.\\n\\nOUTPUT FORMAT:\\n\\n# Knowledge Base: [GPT Name]\\n\\n## Retrieval Triggers\\nA table mapping user-input triggers to KB sections.\\n\\n| Trigger | Retrieve Section |\\n|---------|------------------|\\n| ... | ## ... |\\n\\n## Core Definitions\\nEvery domain-specific term, one line each.\\n\\n## Domain Frameworks\\nEach framework as a named ### subsection containing: Purpose \\u00b7 When to apply \\u00b7 Steps \\u00b7 Success criteria.\\n\\n## Decision Rules\\nDeterministic if/then rules extracted from the SOP.\\n\\n## Quality Standards\\nThe validation criteria the GPT applies to its own outputs.\\n\\n## Edge Case Playbook\\nEach edge case with its deterministic response.\\n\\nOUTPUT RULES (absolute):\\n- No preamble. Begin with \\\"# Knowledge Base:\\\".\\n- Markdown only. No code fences wrapping the whole document.\\n- Dense, retrieval-optimized prose. No marketing tone. No conversational tone.\\n- Do not include the SOP verbatim. Restructure semantically.\\n\" },   { \"role\": \"user\", \"content\": `Purpose Statement:\\n` + $json.purpose_statement + `\\n\\nKnowledge Report:\\n` + $json.knowledge_report + `\\n\\nOperationalized Process (SOP):\\n` + $json.sop } ]}) }}",
         "options": {
           "response": {
             "response": {
@@ -407,7 +407,7 @@
           "timeout": 180000
         }
       },
-      "id": "3b4c23f9-6aa5-498c-9369-6751fdb10edd",
+      "id": "a73cb98c-43d3-4f08-b8b4-13c6dfb03e48",
       "name": "N4 \u00b7 KB Builder",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -429,55 +429,55 @@
         "assignments": {
           "assignments": [
             {
-              "id": "ef2f2873-6cf9-4683-9d75-2fdcdb19e54a",
+              "id": "ee757e60-200f-4021-beb3-3a5e7fce23f2",
               "name": "raw_idea",
               "value": "={{ $('Parse N3').item.json.raw_idea }}",
               "type": "string"
             },
             {
-              "id": "85acbb4e-54ab-414b-a0f8-897ad9405388",
+              "id": "f88b2535-55da-4b3b-ab0c-1f8f3bb80e26",
               "name": "system_context",
               "value": "={{ $('Parse N3').item.json.system_context }}",
               "type": "string"
             },
             {
-              "id": "26666270-c28f-4868-91bf-dfb6857b3ecc",
+              "id": "8b1a6e1b-a8ad-4935-b303-799be9269985",
               "name": "course_correction",
               "value": "={{ $('Parse N3').item.json.course_correction }}",
               "type": "string"
             },
             {
-              "id": "08bd432a-e0fc-4e78-8cee-55f8a4bb6eab",
+              "id": "35a73315-afa9-42b5-b3a2-17bc6be7e48c",
               "name": "idea_document",
               "value": "={{ $('Parse N3').item.json.idea_document }}",
               "type": "string"
             },
             {
-              "id": "d37e212f-a810-4aa3-8322-0d9a5d86a1a5",
+              "id": "ec924cab-b526-4623-aeef-f55a6265c045",
               "name": "purpose_statement",
               "value": "={{ $('Parse N3').item.json.purpose_statement }}",
               "type": "string"
             },
             {
-              "id": "72098a9c-08af-429c-9431-dd2d03509985",
+              "id": "71a36ce6-6982-421c-883e-bad3b041243b",
               "name": "gpt_name",
               "value": "={{ $('Parse N3').item.json.gpt_name }}",
               "type": "string"
             },
             {
-              "id": "5f1e80f2-9764-4333-83fe-8d48ead11753",
+              "id": "cfedd52f-3ef9-4dbd-a5f9-7667192d5101",
               "name": "knowledge_report",
               "value": "={{ $('Parse N3').item.json.knowledge_report }}",
               "type": "string"
             },
             {
-              "id": "8fb49fc5-db37-48b6-a3a1-abcefaa65e02",
+              "id": "7f0f275c-495e-4efd-a724-2bbb421af3fb",
               "name": "sop",
               "value": "={{ $('Parse N3').item.json.sop }}",
               "type": "string"
             },
             {
-              "id": "f149f7b6-6eb4-4a44-8584-a200a006c2d1",
+              "id": "9bb27291-e73c-43e4-93fe-7c58389df626",
               "name": "kb_file",
               "value": "={{ $json.choices[0].message.content }}",
               "type": "string"
@@ -487,7 +487,7 @@
         "includeOtherFields": false,
         "options": {}
       },
-      "id": "44cf8b42-65bc-49c0-b530-a9c761cc07fd",
+      "id": "73eeb371-e789-4e07-8fbb-811374261cad",
       "name": "Parse N4",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
@@ -514,7 +514,7 @@
         "sendBody": true,
         "contentType": "json",
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.2, \"max_tokens\": 8192, \"messages\": [   { \"role\": \"system\", \"content\": \"You are the MetaPrompt Synthesizer. You produce the final System Prompt for a Custom GPT, ready to paste into the GPT's \\\"Instructions\\\" field in the Configure tab.\\n\\nYou follow this exact template. You fill every section. You leave no placeholders.\\n\\n# [NAME_OF_AI_ASSISTANT]\\n\\n## Identity\\n[Concise statement of what this assistant is, directed at the model.]\\n\\n## Objective\\n[The single specific outcome this assistant must produce.]\\n\\n## Workflow\\nThe assistant follows this workflow on every invocation:\\n1. ...\\n2. ...\\n3. ...\\n(Continue with every step from the SOP.)\\n\\n## Domain Frameworks\\nThe assistant applies the following frameworks. For each, the assistant retrieves the corresponding section from its attached Knowledge Base file when the trigger fires:\\n- [Framework name] \\u2014 When [trigger], retrieve \\\"## [section]\\\" from the attached Knowledge Base.\\n\\n## Knowledge Base Retrieval Rules\\nThe assistant retrieves from its attached Knowledge Base file according to these rules:\\n- When the user input matches [pattern], retrieve [section].\\n\\n## Decision Rules\\n[Every deterministic if/then rule from the SOP, in declarative form.]\\n\\n## Quality Standards\\nBefore emitting any output, the assistant verifies:\\n- ...\\n\\n## Edge Case Handling\\n- If [edge case], the assistant [response].\\n\\n## Constraints\\nThe assistant MUST NOT:\\n- ...\\n\\n## Output Format\\n[The exact format of the assistant's deliverable, with schema or example.]\\n\\nOUTPUT RULES (absolute):\\n- Output ONLY the populated System Prompt, beginning with \\\"# [Name]\\\".\\n- No preamble, no closing remarks, no meta-commentary about your process.\\n- Fill every section. Do not leave bracketed placeholders.\\n- Reference the Knowledge Base as \\\"your attached Knowledge Base file\\\" (the user uploads the .md in the Configure tab).\\n- Do not wrap output in code fences.\\n\" },   { \"role\": \"user\", \"content\": `GPT Name (use exactly):\\n` + $json.gpt_name + `\\n\\nPurpose Statement:\\n` + $json.purpose_statement + `\\n\\nIdea Document:\\n` + $json.idea_document + `\\n\\nOperationalized Process (SOP):\\n` + $json.sop + `\\n\\nKnowledge Base (for retrieval rule alignment):\\n` + $json.kb_file } ]}) }}",
+        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.2, \"max_tokens\": 8192, \"reasoning_effort\": \"none\", \"messages\": [   { \"role\": \"system\", \"content\": \"You are the MetaPrompt Synthesizer. You produce the final System Prompt for a Custom GPT, ready to paste into the GPT's \\\"Instructions\\\" field in the Configure tab.\\n\\nYou follow this exact template. You fill every section. You leave no placeholders.\\n\\n# [NAME_OF_AI_ASSISTANT]\\n\\n## Identity\\n[Concise statement of what this assistant is, directed at the model.]\\n\\n## Objective\\n[The single specific outcome this assistant must produce.]\\n\\n## Workflow\\nThe assistant follows this workflow on every invocation:\\n1. ...\\n2. ...\\n3. ...\\n(Continue with every step from the SOP.)\\n\\n## Domain Frameworks\\nThe assistant applies the following frameworks. For each, the assistant retrieves the corresponding section from its attached Knowledge Base file when the trigger fires:\\n- [Framework name] \\u2014 When [trigger], retrieve \\\"## [section]\\\" from the attached Knowledge Base.\\n\\n## Knowledge Base Retrieval Rules\\nThe assistant retrieves from its attached Knowledge Base file according to these rules:\\n- When the user input matches [pattern], retrieve [section].\\n\\n## Decision Rules\\n[Every deterministic if/then rule from the SOP, in declarative form.]\\n\\n## Quality Standards\\nBefore emitting any output, the assistant verifies:\\n- ...\\n\\n## Edge Case Handling\\n- If [edge case], the assistant [response].\\n\\n## Constraints\\nThe assistant MUST NOT:\\n- ...\\n\\n## Output Format\\n[The exact format of the assistant's deliverable, with schema or example.]\\n\\nOUTPUT RULES (absolute):\\n- Output ONLY the populated System Prompt, beginning with \\\"# [Name]\\\".\\n- No preamble, no closing remarks, no meta-commentary about your process.\\n- Fill every section. Do not leave bracketed placeholders.\\n- Reference the Knowledge Base as \\\"your attached Knowledge Base file\\\" (the user uploads the .md in the Configure tab).\\n- Do not wrap output in code fences.\\n\" },   { \"role\": \"user\", \"content\": `GPT Name (use exactly):\\n` + $json.gpt_name + `\\n\\nPurpose Statement:\\n` + $json.purpose_statement + `\\n\\nIdea Document:\\n` + $json.idea_document + `\\n\\nOperationalized Process (SOP):\\n` + $json.sop + `\\n\\nKnowledge Base (for retrieval rule alignment):\\n` + $json.kb_file } ]}) }}",
         "options": {
           "response": {
             "response": {
@@ -524,7 +524,7 @@
           "timeout": 180000
         }
       },
-      "id": "23f2c607-15fb-4534-aa59-e43861beb66a",
+      "id": "4bcbe76e-2678-428e-8d7a-0348fc502634",
       "name": "N5 \u00b7 MetaPrompt",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -546,61 +546,61 @@
         "assignments": {
           "assignments": [
             {
-              "id": "d36234a4-0e2e-497b-95f7-c462ab700a8b",
+              "id": "dba28884-b319-404a-a1b2-78b68d3bc018",
               "name": "raw_idea",
               "value": "={{ $('Parse N4').item.json.raw_idea }}",
               "type": "string"
             },
             {
-              "id": "60f45434-ed4a-40ee-9ed1-f8fd3480ef3c",
+              "id": "1e95f209-e15a-4ab6-a469-a97ee1745b67",
               "name": "system_context",
               "value": "={{ $('Parse N4').item.json.system_context }}",
               "type": "string"
             },
             {
-              "id": "971858ca-9d20-4d67-86aa-4ec65a1f3575",
+              "id": "a01b8713-5d8e-4aa6-b1f3-c6595a8d2018",
               "name": "course_correction",
               "value": "={{ $('Parse N4').item.json.course_correction }}",
               "type": "string"
             },
             {
-              "id": "69b3ca13-392e-4ffa-b31f-ae5060764a30",
+              "id": "4d05a020-112a-4af8-a3ad-a0137a014077",
               "name": "idea_document",
               "value": "={{ $('Parse N4').item.json.idea_document }}",
               "type": "string"
             },
             {
-              "id": "97830f8d-1770-450f-a4e4-fbf2158d1e28",
+              "id": "3850bb1d-dc76-4b2f-a196-b404e054f751",
               "name": "purpose_statement",
               "value": "={{ $('Parse N4').item.json.purpose_statement }}",
               "type": "string"
             },
             {
-              "id": "74ab64b2-c492-482b-b067-bc2d6206ac1d",
+              "id": "2e52dba0-91c5-429d-bb24-60811b0ab48d",
               "name": "gpt_name",
               "value": "={{ $('Parse N4').item.json.gpt_name }}",
               "type": "string"
             },
             {
-              "id": "06130f56-1c6a-4ab0-a121-c196d827a719",
+              "id": "dfce66cb-d02a-4fdb-bf80-a1da7727ddad",
               "name": "knowledge_report",
               "value": "={{ $('Parse N4').item.json.knowledge_report }}",
               "type": "string"
             },
             {
-              "id": "2ca5dd4c-bd95-4652-a067-8a8e5c02fa2b",
+              "id": "d71da371-fa87-40a6-b1ca-a982837e5cdc",
               "name": "sop",
               "value": "={{ $('Parse N4').item.json.sop }}",
               "type": "string"
             },
             {
-              "id": "f4406efd-c510-488f-bf1c-24ac139a3662",
+              "id": "797a925b-dcae-4721-8d92-bc920164730d",
               "name": "kb_file",
               "value": "={{ $('Parse N4').item.json.kb_file }}",
               "type": "string"
             },
             {
-              "id": "121fa301-961f-4e10-badd-ac424c1f69e1",
+              "id": "c24c9391-8776-4850-894a-8af64177edbd",
               "name": "system_prompt",
               "value": "={{ $json.choices[0].message.content }}",
               "type": "string"
@@ -610,7 +610,7 @@
         "includeOtherFields": false,
         "options": {}
       },
-      "id": "2933fbaa-6aab-4acb-9acc-f257e8d0bb78",
+      "id": "0abbf643-e431-45a8-bf7b-355e074ae142",
       "name": "Parse N5",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
@@ -637,7 +637,7 @@
         "sendBody": true,
         "contentType": "json",
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.0, \"max_tokens\": 4096, \"messages\": [   { \"role\": \"system\", \"content\": \"You are the QA Auditor. You verify that the final System Prompt and SOP satisfy the original Idea/Constraints. You produce a structured audit verdict in JSON.\\n\\nCHECKS TO PERFORM:\\n\\n1. CONSTRAINT COVERAGE\\nFor each item in the Idea Document's \\\"Guardrails & Constraints\\\" section, verify it appears semantically in the System Prompt's Constraints section. List any missing constraints verbatim.\\n\\n2. STRATEGIC DRIFT\\nCompare the System Prompt's Objective and Workflow to the Purpose Statement. Flag scope, output, or intent drift.\\n\\n3. TOKEN SHORTCUTS\\nInspect the SOP for compression artifacts: \\\"etc.\\\", \\\"and so on\\\", \\\"...\\\", \\\"as needed\\\", \\\"various\\\", vague references to \\\"the framework\\\" or \\\"the process\\\" without naming it. Flag every instance with quoted text.\\n\\n4. FORBIDDEN FORMAT\\nVerify the SOP uses third-person SOP voice. Flag any \\\"You are an AI\\\", \\\"Your role is\\\", or second-person system-prompt phrasing in the SOP.\\n\\n5. INTERNAL CONSISTENCY\\nVerify that every section referenced in the System Prompt's \\\"Knowledge Base Retrieval Rules\\\" actually exists as a heading in the Knowledge Base.\\n\\n6. INPUT/OUTPUT FAITHFULNESS\\nVerify the System Prompt's \\\"Output Format\\\" matches the \\\"Outputs (Downstream Deliverables)\\\" section of the Idea Document.\\n\\nOUTPUT (JSON only \\u2014 no prose, no markdown fences, no commentary):\\n\\n{\\n  \\\"verdict\\\": \\\"PASS\\\" or \\\"FAIL\\\",\\n  \\\"checks\\\": {\\n    \\\"constraint_coverage\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"missing\\\": [] },\\n    \\\"strategic_drift\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"drifts\\\": [] },\\n    \\\"token_shortcuts\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"instances\\\": [] },\\n    \\\"forbidden_format\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"instances\\\": [] },\\n    \\\"internal_consistency\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"broken_references\\\": [] },\\n    \\\"io_faithfulness\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"mismatches\\\": [] }\\n  },\\n  \\\"course_correction_prompt\\\": \\\"\\\",\\n  \\\"tactical_library\\\": [\\n    { \\\"tactic\\\": \\\"\\\", \\\"use_when\\\": \\\"\\\", \\\"snippet\\\": \\\"\\\" }\\n  ]\\n}\\n\\nRULES:\\n- Output ONLY valid JSON. No code fences. No leading or trailing text.\\n- verdict is \\\"FAIL\\\" if any check status is \\\"FAIL\\\".\\n- course_correction_prompt: the exact text the user would send back to the Operationalizer to fix all failed checks. Empty string if verdict is PASS.\\n- tactical_library: 5 to 10 short steering snippets the user pastes mid-session if the deployed GPT drifts. Each tactic has: a short label, a use_when trigger, and the exact snippet text.\\n\" },   { \"role\": \"user\", \"content\": `Idea Document:\\n` + $json.idea_document + `\\n\\nPurpose Statement:\\n` + $json.purpose_statement + `\\n\\nOperationalized Process (SOP):\\n` + $json.sop + `\\n\\nKnowledge Base:\\n` + $json.kb_file + `\\n\\nSystem Prompt:\\n` + $json.system_prompt } ]}) }}",
+        "jsonBody": "={{ JSON.stringify({ \"model\": \"gemini-2.5-flash\", \"temperature\": 0.0, \"max_tokens\": 4096, \"reasoning_effort\": \"none\", \"messages\": [   { \"role\": \"system\", \"content\": \"You are the QA Auditor. You verify that the final System Prompt and SOP satisfy the original Idea/Constraints. You produce a structured audit verdict in JSON.\\n\\nCHECKS TO PERFORM:\\n\\n1. CONSTRAINT COVERAGE\\nFor each item in the Idea Document's \\\"Guardrails & Constraints\\\" section, verify it appears semantically in the System Prompt's Constraints section. List any missing constraints verbatim.\\n\\n2. STRATEGIC DRIFT\\nCompare the System Prompt's Objective and Workflow to the Purpose Statement. Flag scope, output, or intent drift.\\n\\n3. TOKEN SHORTCUTS\\nInspect the SOP for compression artifacts: \\\"etc.\\\", \\\"and so on\\\", \\\"...\\\", \\\"as needed\\\", \\\"various\\\", vague references to \\\"the framework\\\" or \\\"the process\\\" without naming it. Flag every instance with quoted text.\\n\\n4. FORBIDDEN FORMAT\\nVerify the SOP uses third-person SOP voice. Flag any \\\"You are an AI\\\", \\\"Your role is\\\", or second-person system-prompt phrasing in the SOP.\\n\\n5. INTERNAL CONSISTENCY\\nVerify that every section referenced in the System Prompt's \\\"Knowledge Base Retrieval Rules\\\" actually exists as a heading in the Knowledge Base.\\n\\n6. INPUT/OUTPUT FAITHFULNESS\\nVerify the System Prompt's \\\"Output Format\\\" matches the \\\"Outputs (Downstream Deliverables)\\\" section of the Idea Document.\\n\\nOUTPUT (JSON only \\u2014 no prose, no markdown fences, no commentary):\\n\\n{\\n  \\\"verdict\\\": \\\"PASS\\\" or \\\"FAIL\\\",\\n  \\\"checks\\\": {\\n    \\\"constraint_coverage\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"missing\\\": [] },\\n    \\\"strategic_drift\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"drifts\\\": [] },\\n    \\\"token_shortcuts\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"instances\\\": [] },\\n    \\\"forbidden_format\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"instances\\\": [] },\\n    \\\"internal_consistency\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"broken_references\\\": [] },\\n    \\\"io_faithfulness\\\": { \\\"status\\\": \\\"PASS or FAIL\\\", \\\"mismatches\\\": [] }\\n  },\\n  \\\"course_correction_prompt\\\": \\\"\\\",\\n  \\\"tactical_library\\\": [\\n    { \\\"tactic\\\": \\\"\\\", \\\"use_when\\\": \\\"\\\", \\\"snippet\\\": \\\"\\\" }\\n  ]\\n}\\n\\nRULES:\\n- Output ONLY valid JSON. No code fences. No leading or trailing text.\\n- verdict is \\\"FAIL\\\" if any check status is \\\"FAIL\\\".\\n- course_correction_prompt: the exact text the user would send back to the Operationalizer to fix all failed checks. Empty string if verdict is PASS.\\n- tactical_library: 5 to 10 short steering snippets the user pastes mid-session if the deployed GPT drifts. Each tactic has: a short label, a use_when trigger, and the exact snippet text.\\n\" },   { \"role\": \"user\", \"content\": `Idea Document:\\n` + $json.idea_document + `\\n\\nPurpose Statement:\\n` + $json.purpose_statement + `\\n\\nOperationalized Process (SOP):\\n` + $json.sop + `\\n\\nKnowledge Base:\\n` + $json.kb_file + `\\n\\nSystem Prompt:\\n` + $json.system_prompt } ]}) }}",
         "options": {
           "response": {
             "response": {
@@ -647,7 +647,7 @@
           "timeout": 180000
         }
       },
-      "id": "38123e87-c016-486e-9a3f-86987900e0d2",
+      "id": "f401a546-9bc6-4afd-a2d1-dbccc029b703",
       "name": "N6 \u00b7 QA Auditor",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -669,55 +669,55 @@
         "assignments": {
           "assignments": [
             {
-              "id": "cc08a8a3-4db5-4e47-8bc5-d7ed964d9a48",
+              "id": "cc02b50f-e102-4494-a7d2-fa646d007b29",
               "name": "gpt_name",
               "value": "={{ $('Parse N5').item.json.gpt_name }}",
               "type": "string"
             },
             {
-              "id": "fc013172-d406-4c07-8ebc-e27697b17a53",
+              "id": "ca9c76c5-5c19-4a50-bbd3-523631384f34",
               "name": "idea_document",
               "value": "={{ $('Parse N5').item.json.idea_document }}",
               "type": "string"
             },
             {
-              "id": "ef085c19-872e-4374-8742-9d621753aaf4",
+              "id": "59b7264e-2a5b-44d7-8a94-b3497c9cb584",
               "name": "purpose_statement",
               "value": "={{ $('Parse N5').item.json.purpose_statement }}",
               "type": "string"
             },
             {
-              "id": "82e3c3b2-3178-4c5a-b490-6435e5d7698c",
+              "id": "f372323f-889b-4497-9168-0e11f385bf2b",
               "name": "knowledge_report",
               "value": "={{ $('Parse N5').item.json.knowledge_report }}",
               "type": "string"
             },
             {
-              "id": "4610ef54-b4ec-4158-9536-e2cc2befd69a",
+              "id": "76473ae2-e40b-4529-98ad-b3458bff3b9f",
               "name": "sop",
               "value": "={{ $('Parse N5').item.json.sop }}",
               "type": "string"
             },
             {
-              "id": "aba97dc3-6431-4687-ad89-294b19547862",
+              "id": "86e01a95-9d29-4c79-9f90-a33c752662c0",
               "name": "kb_file",
               "value": "={{ $('Parse N5').item.json.kb_file }}",
               "type": "string"
             },
             {
-              "id": "7cf2b837-a698-47b5-ab1c-222b9a097c74",
+              "id": "deb703b1-7cb2-4716-8265-550868a89bbb",
               "name": "system_prompt",
               "value": "={{ $('Parse N5').item.json.system_prompt }}",
               "type": "string"
             },
             {
-              "id": "10ea8a71-b84e-4f84-a276-5f2431ae5f78",
+              "id": "aae6d7fe-9c00-48d3-be1c-68ab590d74f0",
               "name": "audit_raw",
               "value": "={{ $json.choices[0].message.content }}",
               "type": "string"
             },
             {
-              "id": "82a11fa1-ff4d-49a3-81cc-94f2f0b45e6b",
+              "id": "c017b645-c805-4a37-9d31-b793883e55ab",
               "name": "audit",
               "value": "={{ (() => { const s = $json.choices[0].message.content || ''; const m = s.match(/\\{[\\s\\S]*\\}/); const j = m ? m[0] : s.replace(/^```json\\n?/i,'').replace(/```$/,'').trim(); try { return JSON.parse(j); } catch (e) { return { verdict: 'PARSE_ERROR', error: e.message, raw: s }; } })() }}",
               "type": "object"
@@ -727,7 +727,7 @@
         "includeOtherFields": false,
         "options": {}
       },
-      "id": "a7782d26-35f8-4439-8e24-2fe4217a7cc8",
+      "id": "81fbec39-80b3-4763-be5e-46a4c6c94810",
       "name": "Parse N6",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
@@ -742,7 +742,7 @@
         "responseBody": "={{ { ok: true, gpt_name: $json.gpt_name, idea_document: $json.idea_document, purpose_statement: $json.purpose_statement, knowledge_report: $json.knowledge_report, sop: $json.sop, kb_file: $json.kb_file, system_prompt: $json.system_prompt, audit: $json.audit } }}",
         "options": {}
       },
-      "id": "c3f4ca68-02b4-4cad-85cf-2c505a2e1e04",
+      "id": "47a6e90f-c42a-4d2c-98ae-733e0aa9eba0",
       "name": "Respond",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
@@ -912,8 +912,8 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "d4323d9d-72d0-4de6-b653-30be54a1c555",
-  "id": "fffec777-3194-4497-a704-6134540f607d",
+  "versionId": "42f37fca-c0f2-491b-b2ab-4dcfa83846ce",
+  "id": "1b02e5e0-5412-4fa7-b9a4-022eb77a57b1",
   "meta": {
     "templateCredsSetupCompleted": false
   },
